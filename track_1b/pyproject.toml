@@ -32,7 +32,7 @@ scrutineer = "scrutineer.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/scrutineer"]
-artifacts = ["src/scrutineer/report/fonts/*.ttf", "src/scrutineer/templates/*.yaml", "src/scrutineer/site/assets/*"]
+artifacts = ["src/scrutineer/report/fonts/*.ttf", "src/scrutineer/templates/*.yaml", "src/scrutineer/report/report.typ", "src/scrutineer/site/assets/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

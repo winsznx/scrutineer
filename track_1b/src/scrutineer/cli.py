@@ -46,7 +46,13 @@ def cmd_build(args: argparse.Namespace, paths: Paths) -> int:
     payload = serialise(items)
     info = manifest(payload, file_sha256(paths.csv), file_sha256(paths.titles), log)
 
+    from scrutineer.build.robustness import order_swap_items
+
+    swap_payload = serialise(order_swap_items(items))
     if args.check:
+        if paths.order_swap_items.read_bytes() != swap_payload:
+            print("robustness items differ from a fresh build", file=sys.stderr)
+            return 1
         stored = json.loads(paths.items_manifest.read_text())
         on_disk = hashlib.sha256(paths.items.read_bytes()).hexdigest()
         if stored["items_sha256"] != info["items_sha256"] or on_disk != info["items_sha256"]:
@@ -57,6 +63,8 @@ def cmd_build(args: argparse.Namespace, paths: Paths) -> int:
         return 0
 
     paths.items.write_bytes(payload)
+    paths.order_swap_items.parent.mkdir(parents=True, exist_ok=True)
+    paths.order_swap_items.write_bytes(swap_payload)
     paths.items_manifest.write_text(json.dumps(info, indent=2, ensure_ascii=False) + "\n")
     print(f"universe {len(universe)} votes, post-cutoff {len(post_cutoff)}, "
           f"{info['item_count']} items, sha256 {info['items_sha256']}")
@@ -75,8 +83,8 @@ def load_env_files(paths: Paths) -> None:
                 os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-def _load_items(paths: Paths) -> list[dict[str, Any]]:
-    return [json.loads(line) for line in paths.items.read_text(encoding="utf-8").splitlines()]
+def _load_items(path: Path) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
 
 
 def _select(items: list[dict[str, Any]], args: argparse.Namespace) -> list[dict[str, Any]]:
@@ -125,10 +133,12 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
 
     paths.responses.mkdir(parents=True, exist_ok=True)
     out = paths.responses / f"{args.run_id}.jsonl"
-    items_sha = hashlib.sha256(paths.items.read_bytes()).hexdigest()
-    write_meta(paths.responses / f"{args.run_id}.meta.json", config, items_sha)
+    items_path = Path(args.items).resolve() if args.items else paths.items
+    items_sha = hashlib.sha256(items_path.read_bytes()).hexdigest()
+    extra_meta = {"items_path": str(items_path.relative_to(paths.root))} if args.items else {}
+    write_meta(paths.responses / f"{args.run_id}.meta.json", config, items_sha, extra_meta)
 
-    selected = order_items(_select(_load_items(paths), args))
+    selected = order_items(_select(_load_items(items_path), args))
     if args.limit:
         selected = selected[: args.limit]
     todo = pending_items(selected, read_records(out), args.retry_failed)
@@ -263,6 +273,10 @@ def cmd_report(args: argparse.Namespace, paths: Paths) -> int:
         else:
             path.write_text(updated, encoding="utf-8")
             print(f"updated generated numbers in {name}")
+    if args.pdf:
+        from scrutineer.report.pdf import export_pdf
+
+        print(f"wrote {export_pdf(paths.root / 'technical_report.md', paths.root / 'Scrutineer_Report.pdf')}")
     if stale:
         print(f"REPORT CHECK FAILED: generated numbers are stale in {', '.join(stale)}; run `make report`",
               file=sys.stderr)
@@ -347,6 +361,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--families", help="comma separated, e.g. F1,F7")
     run.add_argument("--langs", help="comma separated, e.g. de,fr")
     run.add_argument("--item-ids", help="file with item ids to restrict to")
+    run.add_argument("--items", help="alternative item file, e.g. data/robustness/order_swap_items.jsonl")
     run.add_argument("--limit", type=int, help="first N items in priority order")
     run.add_argument("--retry-failed", action="store_true")
     run.add_argument("--workers", type=int, default=8)
@@ -370,6 +385,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     report = sub.add_parser("report", help="render figures and sync generated numbers into the docs")
     report.add_argument("--check", action="store_true", help="fail instead of writing if docs are stale")
+    report.add_argument("--pdf", action="store_true", help="also export Scrutineer_Report.pdf (pandoc + typst)")
 
     human = sub.add_parser("export-human-check", help="blind 20%% sample of judgements for labelling")
     human.add_argument("--fraction", type=float, default=0.2)

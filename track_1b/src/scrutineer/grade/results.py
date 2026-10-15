@@ -20,6 +20,8 @@ from scrutineer.grade.metrics import (
     directional_by_lang,
     era_instrument,
     headline,
+    language_bias,
+    order_swap,
     r,
     reasoning_claim_status,
     reasoning_vs_recall,
@@ -47,9 +49,15 @@ def load_items(paths: Paths) -> dict[str, dict[str, Any]]:
 
 
 def run_ids(paths: Paths) -> list[str]:
-    """Runs with a meta file, in R1, R2, ... order. Smoke runs (prefix `smoke`) are excluded."""
-    ids = [p.name.removesuffix(".meta.json") for p in paths.responses.glob("*.meta.json")]
-    return sorted((i for i in ids if not i.startswith("smoke")), key=lambda i: (len(i), i))
+    """Main runs over items.jsonl, in R1, R2, ... order. Smoke runs and runs over other item
+    files (robustness checks) are excluded."""
+    ids = []
+    for meta_path in paths.responses.glob("*.meta.json"):
+        run_id = meta_path.name.removesuffix(".meta.json")
+        if run_id.startswith("smoke") or "items_path" in json.loads(meta_path.read_text()):
+            continue
+        ids.append(run_id)
+    return sorted(ids, key=lambda i: (len(i), i))
 
 
 def graded_run(paths: Paths, run_id: str, items: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -140,6 +148,23 @@ def f6_parser_judge_agreement(
             "cohen_kappa": r(cohen_kappa([p[0] for p in pairs], [p[1] for p in pairs]))}
 
 
+def robustness(paths: Paths, graded: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """E2: order-swapped F1 items against the matching R2 answers."""
+    swapped_path = paths.responses / "E2.jsonl"
+    if not swapped_path.exists() or "R2" not in graded:
+        return {"order_swap": None}
+    swap_items = {i["item_id"]: i for i in
+                  (json.loads(line) for line in paths.order_swap_items.read_text(encoding="utf-8").splitlines())}
+    records = read_records(swapped_path)
+    swapped = []
+    for item_id, record in records.items():
+        g = grade_item(swap_items[item_id], record, None)
+        swapped.append({**g, "source_item_id": swap_items[item_id]["source_item_id"]})
+    original = {g["item_id"]: g for g in graded["R2"]}
+    meta = json.loads((paths.responses / "E2.meta.json").read_text())
+    return {"order_swap": {"model": meta["model"], "compared_with": "R2", "by_lang": order_swap(swapped, original)}}
+
+
 def _optional_json(path: Path) -> Any:
     return json.loads(path.read_text()) if path.exists() else None
 
@@ -171,6 +196,7 @@ def assemble(paths: Paths) -> dict[str, Any]:
             "headline": headline(records, items, CLAIM_RUN, run_id),
             "within_instrument": within_instrument(records),
             "era_instrument": era_instrument(records),
+            "language_bias": language_bias(records, items),
             "directional_by_lang": directional_by_lang(records, items),
             "yes_share": yes_share_errors(records),
             "post_cutoff": abstention(records),
@@ -205,6 +231,7 @@ def assemble(paths: Paths) -> dict[str, Any]:
         "results": per_run,
         "claims": claims,
         "baselines": baselines(items),
+        "robustness": robustness(paths, graded),
         "judge": judge_summary(paths, graded),
         "human_check": human_agreement(paths),
         "contamination": _optional_json(paths.docs / "contamination.json"),

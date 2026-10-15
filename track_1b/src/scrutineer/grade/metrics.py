@@ -266,6 +266,66 @@ def reasoning_claim_status(rvr: dict[str, Any]) -> str:
     return "SUPPORTED" if gap >= 15 else "INCONCLUSIVE"
 
 
+def language_bias(graded: list[Graded], items: Items) -> dict[str, Any]:
+    """E1: how often each language's F1 answers say "accepted", against the gold rate,
+    and how often the four core languages agree on the same vote."""
+    f1 = [g for g in graded if g["family"] == "F1" and g.get("grade")]
+    by_lang: dict[str, Any] = {}
+    for lang in ALL_LANGS:
+        subset = [g for g in f1 if g["lang"] == lang]
+        if not subset:
+            continue
+        committed = [g for g in subset if g.get("parsed") in {"accepted", "rejected"}]
+        says = sum(g["parsed"] == "accepted" for g in committed)
+        gold = sum(items[g["item_id"]]["gold"]["outcome"] == "accepted" for g in subset)
+        by_lang[lang] = {
+            "n": len(subset),
+            "says_accepted": r(says / len(committed)) if committed else None,
+            "gold_accepted": r(gold / len(subset)),
+            "accuracy": r(sum(g["grade"] == "correct" for g in subset) / len(subset)),
+            "abstained": r(sum(g.get("parsed") == "abstain" for g in subset) / len(subset)),
+        }
+    answers: dict[str, dict[str, str]] = defaultdict(dict)
+    for g in f1:
+        if g["lang"] in CORE_LANGS and g.get("parsed") in {"accepted", "rejected"}:
+            answers[g["anr"]][g["lang"]] = str(g["parsed"])
+    complete = [a for a in answers.values() if len(a) == len(CORE_LANGS)]
+    agree = sum(len(set(a.values())) == 1 for a in complete)
+    return {
+        "by_lang": by_lang,
+        "votes_all_four_answered": len(complete),
+        "all_four_agree": agree,
+        "all_four_agree_share": r(agree / len(complete)) if complete else None,
+    }
+
+
+def order_swap(swapped: list[Graded], original: dict[str, Graded]) -> dict[str, Any]:
+    """E2: the same F1 items with the answer options in reverse order."""
+    out: dict[str, Any] = {}
+    for lang in ("de", "fr", "en"):
+        pairs = [(original[g["source_item_id"]], g) for g in swapped
+                 if g["lang"] == lang and g.get("grade") and g["source_item_id"] in original
+                 and original[g["source_item_id"]].get("grade")]
+
+        def accepted_share(rows: list[Graded]) -> float | None:
+            committed = [x for x in rows if x.get("parsed") in {"accepted", "rejected"}]
+            return sum(x["parsed"] == "accepted" for x in committed) / len(committed) if committed else None
+
+        before = accepted_share([a for a, _ in pairs])
+        after = accepted_share([b for _, b in pairs])
+        n = len(pairs)
+        out[lang] = {
+            "n": n,
+            "says_accepted_original_order": r(before) if before is not None else None,
+            "says_accepted_swapped_order": r(after) if after is not None else None,
+            "shift_points": r((after - before) * 100) if before is not None and after is not None else None,
+            "accuracy_original_order": r(sum(a["grade"] == "correct" for a, _ in pairs) / n) if n else None,
+            "accuracy_swapped_order": r(sum(b["grade"] == "correct" for _, b in pairs) / n) if n else None,
+            "answer_changed": r(sum(a.get("parsed") != b.get("parsed") for a, b in pairs) / n) if n else None,
+        }
+    return out
+
+
 def run_summary(responses: list[dict[str, Any]], selected: int) -> dict[str, Any]:
     """Budget and latency table for one run, from the raw append-only response file."""
     latest: dict[str, dict[str, Any]] = {}

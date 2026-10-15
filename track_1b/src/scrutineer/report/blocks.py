@@ -164,7 +164,7 @@ def dataset_stats(results: Results) -> str:
     return (f"{items['count']:,} items over {items['universe_votes']} decided federal votes "
             f"(1 Jan 1990 to 27 Sep 2026, {items['gov_lost_votes']} of them lost by the Federal Council) "
             f"plus the 4 votes of 29 Nov 2026.\n\nBy family: {fams}.\n\nBy language: {langs}.\n\n"
-            f"`items.jsonl` sha256 `{items['sha256']}`.\n")
+            f"`items.jsonl` sha256 `{items['sha256'][:16]}…` (full hash in `data/items.manifest.json`).\n")
 
 
 def human_table(results: Results) -> str:
@@ -209,6 +209,36 @@ def replay(results: Results) -> str:
             f"agreement {pct(rep['label_agreement'])}, exact text agreement {pct(rep['exact_agreement'])}.\n")
 
 
+def language_table(results: Results) -> str:
+    rows = ["| Model | Language | Says accepted | Gold accepted | Accuracy | Abstained |",
+            "|---|---|--:|--:|--:|--:|"]
+    agree = []
+    for run in _runs(results):
+        bias = results["results"][run]["language_bias"]
+        for lang, b in bias["by_lang"].items():
+            rows.append(f"| {results['runs'][run]['label']} | {LANG_NAMES[lang]} | {pct(b['says_accepted'])} | "
+                        f"{pct(b['gold_accepted'])} | {pct(b['accuracy'])} (n={b['n']}) | {pct(b['abstained'])} |")
+        agree.append(f"{results['runs'][run]['label']}: {bias['all_four_agree']} of "
+                     f"{bias['votes_all_four_answered']} ({pct(bias['all_four_agree_share'])})")
+    return ("\n".join(rows) + "\n\nVotes where German, French, Italian and English give the same answer: "
+            + "; ".join(agree) + ".\n")
+
+
+def order_swap_table(results: Results) -> str:
+    swap = results.get("robustness", {}).get("order_swap")
+    if not swap:
+        return "_Option-order test (E2) not run yet._\n"
+    rows = [f"Same F1 items, options reversed (\"rejected or accepted\"), `{swap['model']}`, compared with "
+            f"{swap['compared_with']}:", "",
+            "| Language | n | Says accepted, original order | Says accepted, reversed | Shift (pts) | Answer changed |",
+            "|---|--:|--:|--:|--:|--:|"]
+    for lang, b in swap["by_lang"].items():
+        rows.append(f"| {LANG_NAMES[lang]} | {b['n']} | {pct(b['says_accepted_original_order'])} | "
+                    f"{pct(b['says_accepted_swapped_order'])} | {num(b['shift_points'])} | "
+                    f"{pct(b['answer_changed'])} |")
+    return "\n".join(rows) + "\n"
+
+
 BLOCKS: dict[str, Callable[[Results], str]] = {
     "headline": headline,
     "claims": claims,
@@ -222,6 +252,8 @@ BLOCKS: dict[str, Callable[[Results], str]] = {
     "judge_table": judge_table,
     "contamination": contamination,
     "replay": replay,
+    "language_table": language_table,
+    "order_swap_table": order_swap_table,
 }
 
 

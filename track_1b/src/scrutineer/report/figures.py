@@ -171,6 +171,39 @@ def fig_reasoning_vs_recall(results: dict[str, Any], out_dir: Path) -> Path:
     return _save(fig, out_dir, "fig4_reasoning_vs_recall.png")
 
 
+def fig_language_bias(results: dict[str, Any], out_dir: Path) -> Path:
+    runs = _runs(results)
+    langs = ("de", "it", "fr", "en")
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
+    width = 0.8 / max(len(runs), 1)
+    shades = ("#1A1A1A", "#6B6B6B", "#AFAFAF", "#D0D0CE")
+    for i, run in enumerate(runs):
+        bias = results["results"][run]["language_bias"]["by_lang"]
+        for j, lang in enumerate(langs):
+            value = bias.get(lang, {}).get("says_accepted")
+            if value is None:
+                continue
+            x = j + (i - (len(runs) - 1) / 2) * width
+            label = results["runs"][run]["label"] if j == 0 else None
+            ax.bar(x, value * 100, width * 0.9, color=shades[i], label=label, zorder=2)
+            ax.text(x, value * 100 + 1.5, f"{value * 100:.0f}", ha="center", va="bottom", fontsize=7, color=INK)
+    # The gold share comes from the run that answered the most items, i.e. the full universe once complete.
+    fullest = max(runs, key=lambda run: results["results"][run]["language_bias"]["by_lang"].get("de", {}).get("n", 0))
+    by_lang = results["results"][fullest]["language_bias"]["by_lang"]
+    gold = [by_lang.get(lang, {}).get("gold_accepted") for lang in langs]
+    for j, value in enumerate(gold):
+        if value is not None:
+            ax.plot([j - 0.45, j + 0.45], [value * 100] * 2, color=INK, lw=1.0, zorder=3)
+    ax.text(len(langs) - 0.5, (gold[-1] or 0) * 100 + 2, "true share", color=INK, fontsize=7, ha="right")
+    ax.set_xticks(range(len(langs)), [LANG_NAMES[lang] for lang in langs])
+    ax.set_ylim(0, 100)
+    ax.set_yticks([0, 25, 50, 75, 100], ["0", "25", "50", "75", "100%"])
+    ax.yaxis.grid(True, color=RULE, lw=0.6, zorder=0)
+    ax.legend(frameon=False, fontsize=7.5, loc="upper right")
+    ax.set_title("Share of F1 answers saying \"accepted\", by question language")
+    return _save(fig, out_dir, "fig5_language_bias.png")
+
+
 def render_all(results: dict[str, Any], out_dir: Path) -> list[Path]:
     _style()
     if "R1" not in results["results"]:
@@ -180,4 +213,5 @@ def render_all(results: dict[str, Any], out_dir: Path) -> list[Path]:
         fig_directional(results, out_dir),
         fig_era_instrument(results, out_dir),
         fig_reasoning_vs_recall(results, out_dir),
+        fig_language_bias(results, out_dir),
     ]

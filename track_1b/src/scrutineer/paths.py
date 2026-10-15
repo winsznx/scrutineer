@@ -32,6 +32,10 @@ class Paths:
         return self.data / "items.manifest.json"
 
     @property
+    def order_swap_items(self) -> Path:
+        return self.data / "robustness" / "order_swap_items.jsonl"
+
+    @property
     def responses(self) -> Path:
         return self.data / "responses"
 

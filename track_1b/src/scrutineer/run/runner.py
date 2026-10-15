@@ -369,9 +369,9 @@ class Runner:
         return self.state
 
 
-def write_meta(path: Path, config: RunConfig, items_sha256: str) -> None:
+def write_meta(path: Path, config: RunConfig, items_sha256: str, extra: dict[str, Any] | None = None) -> None:
     """Record run parameters once; refuse to resume a file made with different ones."""
-    meta = {**config.meta(), "items_sha256": items_sha256}
+    meta = {**config.meta(), "items_sha256": items_sha256, **(extra or {})}
     if path.exists():
         stored = json.loads(path.read_text())
         mismatched = {
