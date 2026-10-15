@@ -1,8 +1,8 @@
 # Contributions back to Apertus
 
-After the hackathon submission is in, the finding goes to the Apertus maintainers as an
-issue on https://github.com/swiss-ai/apertus-tech-report (or the model repository they
-point to), with a link to the dataset. Track 1B results are public; it is still posted only
+After the hackathon submission is in, the finding goes to the Apertus maintainers as a
+discussion on the model page, https://huggingface.co/swiss-ai/Apertus-v1.5-70B/discussions,
+with a link to the dataset. Track 1B results are public; it is still posted only
 after submission. Draft below. The numbers are generated from `data/results.json`.
 
 ---
