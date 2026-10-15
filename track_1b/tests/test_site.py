@@ -8,6 +8,7 @@ from typing import Any
 
 import pytest
 
+from scrutineer.grade.results import run_ids
 from scrutineer.paths import Paths
 from scrutineer.site.generate import build_site
 
@@ -90,9 +91,7 @@ def test_one_vote_entry_per_vote(real_site: Path) -> None:
     for vote in payload["votes"]:
         assert vote.keys() >= VOTE_KEYS
         assert ("r" in vote) != payload["split"]
-    assert [run["id"] for run in payload["runs"]] == sorted(
-        (p.name.removesuffix(".meta.json") for p in (REAL_DATA / "responses").glob("*.meta.json")
-         if not p.name.startswith("smoke")), key=lambda run: (len(run), run))
+    assert [run["id"] for run in payload["runs"]] == run_ids(Paths(REAL_DATA.parent))
 
 
 def test_pages_are_static_and_clean(real_site: Path) -> None:
