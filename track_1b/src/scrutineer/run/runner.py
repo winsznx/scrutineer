@@ -31,6 +31,8 @@ DEFAULT_MAX_TOKENS = 60
 THINKING_MAX_TOKENS = 2000
 MAX_ATTEMPTS = 5
 RETRYABLE = {408, 409, 425, 429, 500, 502, 503, 504, 520, 522, 524}
+# Upstream capacity errors that LiteLLM forwards with a non-retryable status code.
+TRANSIENT_MARKERS = ("no available clients", "ratelimiterror", "too many requests", "overloaded")
 # Consecutive failed items after which the endpoint is treated as down and the run stops.
 CIRCUIT_BREAKER = 16
 
@@ -166,6 +168,11 @@ def _extract(payload: dict[str, Any]) -> tuple[str, str | None, str | None]:
     return content, reasoning, choice.get("finish_reason")
 
 
+def _is_transient(response: httpx.Response) -> bool:
+    body = response.text[:500].lower()
+    return response.status_code == 400 and any(marker in body for marker in TRANSIENT_MARKERS)
+
+
 def _billed_cost(response: httpx.Response) -> float | None:
     """LiteLLM reports the exact charge per request in a response header."""
     raw = response.headers.get("x-litellm-response-cost")
@@ -239,7 +246,7 @@ class Runner:
                 last_status = response.status_code
                 if response.status_code == 402:
                     raise StopRun(f"HTTP 402 from server: {response.text[:300]}")
-                if response.status_code in RETRYABLE:
+                if response.status_code in RETRYABLE or _is_transient(response):
                     last_error = response.text[:300]
                     await self._backoff(attempt, response.headers.get("retry-after"))
                     continue

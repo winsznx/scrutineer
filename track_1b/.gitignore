@@ -31,3 +31,6 @@ build/
 
 # Local model weights for the judge and the official-checkpoint replay
 models/
+
+# Local run logs
+logs/
