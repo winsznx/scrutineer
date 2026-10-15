@@ -194,10 +194,20 @@ def contamination(results: Results) -> str:
     c = results.get("contamination")
     if not c:
         return "_Contamination check not run yet._\n"
-    summary = c.get("summary")
-    if isinstance(summary, str):
-        return summary.rstrip() + "\n"
-    return "See `docs/CONTAMINATION.md`.\n"
+    lists = "; ".join(f"`{b['file']}` ({b['lines']:,} hosts): "
+                      f"{', '.join(b['source_hosts_listed']) or 'no swissvotes.ch or admin.ch host'}"
+                      for b in c["domains"]["blocklists"])
+    rows = ["| Language | Prompts | With a 13-gram hit | Inside the title only | Touching template | "
+            "Titles found verbatim |", "|---|--:|--:|--:|--:|--:|"]
+    corpus = c.get("corpus") or {}
+    for lang, s in corpus.get("languages", {}).items():
+        rows.append(f"| {LANG_NAMES.get(lang, lang)} | {s['prompts']:,} | {s['prompts_with_hit']} | "
+                    f"{s['prompts_with_title_only_hits']} | {s['prompts_with_template_hits']} | "
+                    f"{s['titles_verbatim']['titles']} of {s['distinct_titles']} |")
+    sample = (f"Sample: {corpus.get('docs_per_lang', 0):,} FineWeb-2 documents per language "
+              f"(revision `{str(corpus.get('revision', ''))[:8]}`, seed {corpus.get('seed')}).") if corpus else ""
+    return (f"Apertus robots.txt opt-out lists: {lists}.\n\n" + "\n".join(rows) + f"\n\n{sample} "
+            "Details in `docs/CONTAMINATION.md`.\n")
 
 
 def replay(results: Results) -> str:

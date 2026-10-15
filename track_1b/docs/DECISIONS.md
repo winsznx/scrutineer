@@ -186,3 +186,13 @@ trace for English prompts and an empty trace for German, French and Italian prom
 same backend. This is model behaviour, not a harness setting, and the report gives trace
 length per language. Responses are stored verbatim. The parser grades only the text after
 `<|inner_suffix|>`, and a trace cut off by `max_tokens` counts as no answer.
+
+## D18. FineWeb-2 contamination sample is 100,000 documents per language, not 1%
+
+The PRD asked for 13-gram overlap against a 1% sample of FineWeb-2 in German, French and
+Italian. That is about 17 GB of text, more than this machine could stream and scan in the
+time available, on a disk with a few GB free. The check instead scans 100,000 documents per
+language: one shard per language chosen with a fixed seed from FineWeb-2 revision
+`af9c1333`, read with HTTP range requests, and nothing stored on disk. Shard paths, row
+ranges and hashes are in `docs/CONTAMINATION.md`. The domain check against Apertus's
+robots.txt opt-out lists covers the full lists, not a sample.

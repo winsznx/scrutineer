@@ -1,0 +1,2151 @@
+{
+  "corpus": {
+    "dataset": "HuggingFaceFW/fineweb-2",
+    "docs_per_lang": 100000,
+    "languages": {
+      "de": {
+        "distinct_titles": 337,
+        "hit_ngrams_title_only": 4,
+        "hit_ngrams_touching_template": 0,
+        "max_template_tokens_in_hit": 0,
+        "prompt_ngrams": 24699,
+        "prompts": 1928,
+        "prompts_with_hit": 6,
+        "prompts_with_template_hits": 0,
+        "prompts_with_title_only_hits": 6,
+        "sample": {
+          "bytes_fetched": 157696472,
+          "config": "deu_Latn",
+          "row_groups": [
+            68,
+            97,
+            106,
+            131,
+            160,
+            162,
+            213,
+            233,
+            254,
+            262,
+            295,
+            303,
+            320,
+            321,
+            358,
+            448,
+            464,
+            591,
+            609,
+            667,
+            713,
+            784,
+            803,
+            830,
+            854,
+            879,
+            908,
+            950,
+            989,
+            1018,
+            1062,
+            1104,
+            1138,
+            1140,
+            1174,
+            1193,
+            1196,
+            1313,
+            1316,
+            1325,
+            1331,
+            1335,
+            1368,
+            1407,
+            1427,
+            1531,
+            1535,
+            1563,
+            1612,
+            1695,
+            1788,
+            1793,
+            1832,
+            1847,
+            1853,
+            1868,
+            1926,
+            1950,
+            1973,
+            1990,
+            2063,
+            2091,
+            2098,
+            2117,
+            2151,
+            2178,
+            2228,
+            2234,
+            2244,
+            2275,
+            2375,
+            2390,
+            2414,
+            2474,
+            2504,
+            2521,
+            2525,
+            2552,
+            2560,
+            2569,
+            2598,
+            2633,
+            2636,
+            2653,
+            2697,
+            2727,
+            2822,
+            2826,
+            2868,
+            2931,
+            2950,
+            2978,
+            3017,
+            3029,
+            3032,
+            3085,
+            3246,
+            3252,
+            3256,
+            3278
+          ],
+          "row_ranges": [
+            [
+              68000,
+              69000
+            ],
+            [
+              97000,
+              98000
+            ],
+            [
+              106000,
+              107000
+            ],
+            [
+              131000,
+              132000
+            ],
+            [
+              160000,
+              161000
+            ],
+            [
+              162000,
+              163000
+            ],
+            [
+              213000,
+              214000
+            ],
+            [
+              233000,
+              234000
+            ],
+            [
+              254000,
+              255000
+            ],
+            [
+              262000,
+              263000
+            ],
+            [
+              295000,
+              296000
+            ],
+            [
+              303000,
+              304000
+            ],
+            [
+              320000,
+              321000
+            ],
+            [
+              321000,
+              322000
+            ],
+            [
+              358000,
+              359000
+            ],
+            [
+              448000,
+              449000
+            ],
+            [
+              464000,
+              465000
+            ],
+            [
+              591000,
+              592000
+            ],
+            [
+              609000,
+              610000
+            ],
+            [
+              667000,
+              668000
+            ],
+            [
+              713000,
+              714000
+            ],
+            [
+              784000,
+              785000
+            ],
+            [
+              803000,
+              804000
+            ],
+            [
+              830000,
+              831000
+            ],
+            [
+              854000,
+              855000
+            ],
+            [
+              879000,
+              880000
+            ],
+            [
+              908000,
+              909000
+            ],
+            [
+              950000,
+              951000
+            ],
+            [
+              989000,
+              990000
+            ],
+            [
+              1018000,
+              1019000
+            ],
+            [
+              1062000,
+              1063000
+            ],
+            [
+              1104000,
+              1105000
+            ],
+            [
+              1138000,
+              1139000
+            ],
+            [
+              1140000,
+              1141000
+            ],
+            [
+              1174000,
+              1175000
+            ],
+            [
+              1193000,
+              1194000
+            ],
+            [
+              1196000,
+              1197000
+            ],
+            [
+              1313000,
+              1314000
+            ],
+            [
+              1316000,
+              1317000
+            ],
+            [
+              1325000,
+              1326000
+            ],
+            [
+              1331000,
+              1332000
+            ],
+            [
+              1335000,
+              1336000
+            ],
+            [
+              1368000,
+              1369000
+            ],
+            [
+              1407000,
+              1408000
+            ],
+            [
+              1427000,
+              1428000
+            ],
+            [
+              1531000,
+              1532000
+            ],
+            [
+              1535000,
+              1536000
+            ],
+            [
+              1563000,
+              1564000
+            ],
+            [
+              1612000,
+              1613000
+            ],
+            [
+              1695000,
+              1696000
+            ],
+            [
+              1788000,
+              1789000
+            ],
+            [
+              1793000,
+              1794000
+            ],
+            [
+              1832000,
+              1833000
+            ],
+            [
+              1847000,
+              1848000
+            ],
+            [
+              1853000,
+              1854000
+            ],
+            [
+              1868000,
+              1869000
+            ],
+            [
+              1926000,
+              1927000
+            ],
+            [
+              1950000,
+              1951000
+            ],
+            [
+              1973000,
+              1974000
+            ],
+            [
+              1990000,
+              1991000
+            ],
+            [
+              2063000,
+              2064000
+            ],
+            [
+              2091000,
+              2092000
+            ],
+            [
+              2098000,
+              2099000
+            ],
+            [
+              2117000,
+              2118000
+            ],
+            [
+              2151000,
+              2152000
+            ],
+            [
+              2178000,
+              2179000
+            ],
+            [
+              2228000,
+              2229000
+            ],
+            [
+              2234000,
+              2235000
+            ],
+            [
+              2244000,
+              2245000
+            ],
+            [
+              2275000,
+              2276000
+            ],
+            [
+              2375000,
+              2376000
+            ],
+            [
+              2390000,
+              2391000
+            ],
+            [
+              2414000,
+              2415000
+            ],
+            [
+              2474000,
+              2475000
+            ],
+            [
+              2504000,
+              2505000
+            ],
+            [
+              2521000,
+              2522000
+            ],
+            [
+              2525000,
+              2526000
+            ],
+            [
+              2552000,
+              2553000
+            ],
+            [
+              2560000,
+              2561000
+            ],
+            [
+              2569000,
+              2570000
+            ],
+            [
+              2598000,
+              2599000
+            ],
+            [
+              2633000,
+              2634000
+            ],
+            [
+              2636000,
+              2637000
+            ],
+            [
+              2653000,
+              2654000
+            ],
+            [
+              2697000,
+              2698000
+            ],
+            [
+              2727000,
+              2728000
+            ],
+            [
+              2822000,
+              2823000
+            ],
+            [
+              2826000,
+              2827000
+            ],
+            [
+              2868000,
+              2869000
+            ],
+            [
+              2931000,
+              2932000
+            ],
+            [
+              2950000,
+              2951000
+            ],
+            [
+              2978000,
+              2979000
+            ],
+            [
+              3017000,
+              3018000
+            ],
+            [
+              3029000,
+              3030000
+            ],
+            [
+              3032000,
+              3033000
+            ],
+            [
+              3085000,
+              3086000
+            ],
+            [
+              3246000,
+              3247000
+            ],
+            [
+              3252000,
+              3253000
+            ],
+            [
+              3256000,
+              3257000
+            ],
+            [
+              3278000,
+              3279000
+            ]
+          ],
+          "shard": "data/deu_Latn/train/000_00003.parquet",
+          "shard_row_groups": 3295,
+          "shard_rows": 3295000,
+          "shard_sha256": "3279f6b9a6294377955222a1f2beffbbc4458e86283ceec62d75b9c6065b928f",
+          "shard_url": "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/af9c13333eb981300149d5ca60a8e9d659b276b9/data/deu_Latn/train/000_00003.parquet",
+          "shards_in_config": 181
+        },
+        "sample_docs": 100000,
+        "sample_tokens": 44763355,
+        "source_host_docs": {
+          "docs": 17,
+          "urls": [
+            "http://www.admin.ch/cp/d/43832148_1@fwsrvg.html",
+            "http://www.fedpol.admin.ch/content/ejpd/de/home/themen/wirtschaft/ref_gesetzgebung/ref_abgeschlossene_projekte/ref_transparenz_verguetungen.html",
+            "http://www.toposhop.admin.ch/de/error/pageNotFound",
+            "https://www.admin.ch/gov/de/start/dokumentation/medienmitteilungen.msg-id-62275.html",
+            "https://www.admin.ch/gov/de/start/dokumentation/medienmitteilungen.msg-id-90788.html",
+            "https://www.bafu.admin.ch/bafu/it/home/themen/thema-wasser/wasser--daten--indikatoren-und-karten/wasser--indikatoren/indikator-wasser.pt.html/aHR0cHM6Ly93d3cuaW5kaWthdG9yZW4uYWRtaW4uY2gvUHVibG/ljL0FlbURldGFpbD9pbmQ9V1MwOTQmbG5nPWl0JlN1Ymo9Tg%3D%3D.html",
+            "https://www.bakom.admin.ch/bakom/de/home/geraete-anlagen/marktzugang-elektrischer-geraete/benutzerinformationen.html",
+            "https://www.covid19.admin.ch/de/vaccination/doses/d/geography?geo=TG&geoView=table",
+            "https://www.eda.admin.ch/countries/austria/de/home/reisehinweise/faq.html",
+            "https://www.eda.admin.ch/deza/de/home/themen/wasser.html",
+            "https://www.ezv.admin.ch/ezv/de/home/information-firmen/steuern-und-abgaben/einfuhr-in-die-schweiz/alkoholabgaben-und-veg/getraenkeverpackungen-aus-glas--veg-.html",
+            "https://www.ezv.admin.ch/ezv/de/home/themen/auslandeinsaetze.html",
+            "https://www.fedpol.admin.ch/fedpol/de/home/sicherheit/sprengstoff_pyrotechnik.html",
+            "https://www.klostersanktgeorgen.admin.ch/kstg/de/home/barrierefrei/barrierefrei.html",
+            "https://www.kmu.admin.ch/kmu/de/home/praktisches-wissen/nuetzliche-adressen-und-links/kmu-foerderung-von-institutionen/startups-ch.html",
+            "https://www.meteoschweiz.admin.ch/data/news/2016/3/neue-automatische-messstationen.subpage.html/de/data/blogs/2019/4/popkornwetter.html",
+            "https://www.nb.admin.ch/snl/de/home/ueber-uns/sla/veranstaltungen-sla/veranstaltungen-2016/25-jahre-literaturarchiv--im-zeichen-der-avantgarden.html"
+          ]
+        },
+        "template_examples": [],
+        "title_only_examples": [
+          {
+            "docs": 1,
+            "ngram": "für sauberes trinkwasser und gesunde nahrung keine subventionen für den pestizid und den",
+            "url": "https://www.claudiograf.ch/2017/03/24/sauberes-wasser-f%C3%BCr-alle/"
+          },
+          {
+            "docs": 1,
+            "ngram": "sauberes trinkwasser und gesunde nahrung keine subventionen für den pestizid und den prophylaktischen",
+            "url": "https://www.claudiograf.ch/2017/03/24/sauberes-wasser-f%C3%BCr-alle/"
+          },
+          {
+            "docs": 1,
+            "ngram": "trinkwasser und gesunde nahrung keine subventionen für den pestizid und den prophylaktischen antibiotika",
+            "url": "https://www.claudiograf.ch/2017/03/24/sauberes-wasser-f%C3%BCr-alle/"
+          },
+          {
+            "docs": 1,
+            "ngram": "und gesunde nahrung keine subventionen für den pestizid und den prophylaktischen antibiotika einsatz",
+            "url": "https://www.claudiograf.ch/2017/03/24/sauberes-wasser-f%C3%BCr-alle/"
+          }
+        ],
+        "titles_token_sequence": {
+          "examples": [
+            {
+              "docs": 1,
+              "title": "Elektrizitätsmarktgesetz (EMG)",
+              "url": "https://www.nzz.ch/article8CTNZ-1.418674"
+            }
+          ],
+          "titles": 1
+        },
+        "titles_verbatim": {
+          "examples": [
+            {
+              "docs": 1,
+              "title": "Elektrizitätsmarktgesetz (EMG)",
+              "url": "https://www.nzz.ch/article8CTNZ-1.418674"
+            }
+          ],
+          "titles": 1
+        }
+      },
+      "fr": {
+        "distinct_titles": 337,
+        "hit_ngrams_title_only": 8,
+        "hit_ngrams_touching_template": 1,
+        "max_template_tokens_in_hit": 1,
+        "prompt_ngrams": 21920,
+        "prompts": 1594,
+        "prompts_with_hit": 9,
+        "prompts_with_template_hits": 1,
+        "prompts_with_title_only_hits": 8,
+        "sample": {
+          "bytes_fetched": 162531488,
+          "config": "fra_Latn",
+          "row_groups": [
+            9,
+            38,
+            80,
+            118,
+            226,
+            228,
+            230,
+            236,
+            248,
+            264,
+            267,
+            446,
+            515,
+            582,
+            655,
+            661,
+            665,
+            675,
+            725,
+            816,
+            838,
+            853,
+            881,
+            902,
+            912,
+            937,
+            949,
+            970,
+            1034,
+            1075,
+            1083,
+            1149,
+            1156,
+            1221,
+            1223,
+            1242,
+            1253,
+            1284,
+            1285,
+            1286,
+            1339,
+            1360,
+            1367,
+            1369,
+            1381,
+            1387,
+            1389,
+            1404,
+            1497,
+            1523,
+            1536,
+            1539,
+            1633,
+            1639,
+            1664,
+            1665,
+            1673,
+            1701,
+            1729,
+            1764,
+            1805,
+            1871,
+            1887,
+            1965,
+            1986,
+            2005,
+            2013,
+            2032,
+            2107,
+            2112,
+            2120,
+            2125,
+            2130,
+            2173,
+            2190,
+            2197,
+            2235,
+            2238,
+            2309,
+            2311,
+            2335,
+            2411,
+            2420,
+            2436,
+            2442,
+            2527,
+            2553,
+            2636,
+            2724,
+            2858,
+            2900,
+            2915,
+            2940,
+            3044,
+            3046,
+            3053,
+            3133,
+            3142,
+            3145,
+            3183
+          ],
+          "row_ranges": [
+            [
+              9000,
+              10000
+            ],
+            [
+              38000,
+              39000
+            ],
+            [
+              80000,
+              81000
+            ],
+            [
+              118000,
+              119000
+            ],
+            [
+              226000,
+              227000
+            ],
+            [
+              228000,
+              229000
+            ],
+            [
+              230000,
+              231000
+            ],
+            [
+              236000,
+              237000
+            ],
+            [
+              248000,
+              249000
+            ],
+            [
+              264000,
+              265000
+            ],
+            [
+              267000,
+              268000
+            ],
+            [
+              446000,
+              447000
+            ],
+            [
+              515000,
+              516000
+            ],
+            [
+              582000,
+              583000
+            ],
+            [
+              655000,
+              656000
+            ],
+            [
+              661000,
+              662000
+            ],
+            [
+              665000,
+              666000
+            ],
+            [
+              675000,
+              676000
+            ],
+            [
+              725000,
+              726000
+            ],
+            [
+              816000,
+              817000
+            ],
+            [
+              838000,
+              839000
+            ],
+            [
+              853000,
+              854000
+            ],
+            [
+              881000,
+              882000
+            ],
+            [
+              902000,
+              903000
+            ],
+            [
+              912000,
+              913000
+            ],
+            [
+              937000,
+              938000
+            ],
+            [
+              949000,
+              950000
+            ],
+            [
+              970000,
+              971000
+            ],
+            [
+              1034000,
+              1035000
+            ],
+            [
+              1075000,
+              1076000
+            ],
+            [
+              1083000,
+              1084000
+            ],
+            [
+              1149000,
+              1150000
+            ],
+            [
+              1156000,
+              1157000
+            ],
+            [
+              1221000,
+              1222000
+            ],
+            [
+              1223000,
+              1224000
+            ],
+            [
+              1242000,
+              1243000
+            ],
+            [
+              1253000,
+              1254000
+            ],
+            [
+              1284000,
+              1285000
+            ],
+            [
+              1285000,
+              1286000
+            ],
+            [
+              1286000,
+              1287000
+            ],
+            [
+              1339000,
+              1340000
+            ],
+            [
+              1360000,
+              1361000
+            ],
+            [
+              1367000,
+              1368000
+            ],
+            [
+              1369000,
+              1370000
+            ],
+            [
+              1381000,
+              1382000
+            ],
+            [
+              1387000,
+              1388000
+            ],
+            [
+              1389000,
+              1390000
+            ],
+            [
+              1404000,
+              1405000
+            ],
+            [
+              1497000,
+              1498000
+            ],
+            [
+              1523000,
+              1524000
+            ],
+            [
+              1536000,
+              1537000
+            ],
+            [
+              1539000,
+              1540000
+            ],
+            [
+              1633000,
+              1634000
+            ],
+            [
+              1639000,
+              1640000
+            ],
+            [
+              1664000,
+              1665000
+            ],
+            [
+              1665000,
+              1666000
+            ],
+            [
+              1673000,
+              1674000
+            ],
+            [
+              1701000,
+              1702000
+            ],
+            [
+              1729000,
+              1730000
+            ],
+            [
+              1764000,
+              1765000
+            ],
+            [
+              1805000,
+              1806000
+            ],
+            [
+              1871000,
+              1872000
+            ],
+            [
+              1887000,
+              1888000
+            ],
+            [
+              1965000,
+              1966000
+            ],
+            [
+              1986000,
+              1987000
+            ],
+            [
+              2005000,
+              2006000
+            ],
+            [
+              2013000,
+              2014000
+            ],
+            [
+              2032000,
+              2033000
+            ],
+            [
+              2107000,
+              2108000
+            ],
+            [
+              2112000,
+              2113000
+            ],
+            [
+              2120000,
+              2121000
+            ],
+            [
+              2125000,
+              2126000
+            ],
+            [
+              2130000,
+              2131000
+            ],
+            [
+              2173000,
+              2174000
+            ],
+            [
+              2190000,
+              2191000
+            ],
+            [
+              2197000,
+              2198000
+            ],
+            [
+              2235000,
+              2236000
+            ],
+            [
+              2238000,
+              2239000
+            ],
+            [
+              2309000,
+              2310000
+            ],
+            [
+              2311000,
+              2312000
+            ],
+            [
+              2335000,
+              2336000
+            ],
+            [
+              2411000,
+              2412000
+            ],
+            [
+              2420000,
+              2421000
+            ],
+            [
+              2436000,
+              2437000
+            ],
+            [
+              2442000,
+              2443000
+            ],
+            [
+              2527000,
+              2528000
+            ],
+            [
+              2553000,
+              2554000
+            ],
+            [
+              2636000,
+              2637000
+            ],
+            [
+              2724000,
+              2725000
+            ],
+            [
+              2858000,
+              2859000
+            ],
+            [
+              2900000,
+              2901000
+            ],
+            [
+              2915000,
+              2916000
+            ],
+            [
+              2940000,
+              2941000
+            ],
+            [
+              3044000,
+              3045000
+            ],
+            [
+              3046000,
+              3047000
+            ],
+            [
+              3053000,
+              3054000
+            ],
+            [
+              3133000,
+              3134000
+            ],
+            [
+              3142000,
+              3143000
+            ],
+            [
+              3145000,
+              3146000
+            ],
+            [
+              3183000,
+              3184000
+            ]
+          ],
+          "shard": "data/fra_Latn/train/002_00000.parquet",
+          "shard_row_groups": 3218,
+          "shard_rows": 3218000,
+          "shard_sha256": "cc73d2f29bfe7ab5646d809dc000259b6c7da51dbda9f18fd22320381f1e5c90",
+          "shard_url": "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/af9c13333eb981300149d5ca60a8e9d659b276b9/data/fra_Latn/train/002_00000.parquet",
+          "shards_in_config": 135
+        },
+        "sample_docs": 100000,
+        "sample_tokens": 56356359,
+        "source_host_docs": {
+          "docs": 28,
+          "urls": [
+            "http://www.admin.ch/ch/f/rs/210/a165.html",
+            "http://www.epa.admin.ch/dienstleistungen/berufspraktikum/index.html?lang=fr",
+            "https://www.admin.ch/cp/f/1998Feb25.122235.8973@idz.bfi.admin.ch.html",
+            "https://www.admin.ch/cp/f/1998May22.160139.9419@idz.bfi.admin.ch.html",
+            "https://www.admin.ch/cp/f/3794248b.0@fwsrvg.bfi.admin.ch.html",
+            "https://www.admin.ch/cp/f/403356d3_1@presse1.admin.ch.html",
+            "https://www.admin.ch/cp/f/4333f533_1@fwsrvg.html",
+            "https://www.admin.ch/cp/f/43844c15_1@fwsrvg.html",
+            "https://www.admin.ch/gov/fr/accueil/documentation/communiques.msg-id-73386.html",
+            "https://www.admin.ch/gov/fr/accueil/documentation/communiques.msg-id-86491.html",
+            "https://www.admin.ch/gov/fr/accueil/documentation/communiques.msg-id-89090.html",
+            "https://www.admin.ch/gov/fr/accueil/documentation/communiques.msg-id-92326.html",
+            "https://www.admin.ch/gov/fr/start/dokumentation/medienmitteilungen.msg-id-31587.html",
+            "https://www.admin.ch/opc/fr/classified-compilation/19510133/changes.html",
+            "https://www.admin.ch/opc/fr/classified-compilation/20131995/index.html",
+            "https://www.are.admin.ch/are/fr/home/developpement-et-amenagement-du-territoire/programmes-et-projets/projets-modeles-pour-un-developpement-territorial-durable/2020-2024/utiliser-la-numerisation-pour-le-service-universel/vallees-de-montagne-tessinoises-ti-repenser-un-territoire-pour-les-anciens.html",
+            "https://www.bafu.admin.ch/bafu/fr/home/themes/sol/dossiers.html",
+            "https://www.bfe.admin.ch/bfe/fr/home/actualites-et-medias/communiques-de-presse/mm-test.msg-id-94975.html",
+            "https://www.blw.admin.ch/blw/fr/home/markt/marktbeobachtung/bio.html",
+            "https://www.eda.admin.ch/deza/fr/home/actualites/manifestations/conferences-annuelles/jako-eza-2019/referenten.html"
+          ]
+        },
+        "template_examples": [
+          {
+            "docs": 1,
+            "ngram": "mitage pour un développement durable du milieu bâti initiative contre le mitage la",
+            "template_tokens": 1,
+            "url": "https://www.udc.ch/campagnes/apercu/initiative-populaire-federale-stopper-le-mitage-pour-un-developpement-durable-du-milieu-bati-initiative-contre-le-mitage/texte-de-linitiative/"
+          }
+        ],
+        "title_only_examples": [
+          {
+            "docs": 1,
+            "ngram": "de la loi fédérale sur les allocations pour perte de gain en cas",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          },
+          {
+            "docs": 1,
+            "ngram": "fédérale sur les allocations pour perte de gain en cas de service et",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          },
+          {
+            "docs": 1,
+            "ngram": "la loi fédérale sur les allocations pour perte de gain en cas de",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          },
+          {
+            "docs": 1,
+            "ngram": "le mitage pour un développement durable du milieu bâti initiative contre le mitage",
+            "url": "https://www.udc.ch/campagnes/apercu/initiative-populaire-federale-stopper-le-mitage-pour-un-developpement-durable-du-milieu-bati-initiative-contre-le-mitage/texte-de-linitiative/"
+          },
+          {
+            "docs": 1,
+            "ngram": "les allocations pour perte de gain en cas de service et de maternité",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          },
+          {
+            "docs": 1,
+            "ngram": "loi fédérale sur les allocations pour perte de gain en cas de service",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          },
+          {
+            "docs": 1,
+            "ngram": "stopper le mitage pour un développement durable du milieu bâti initiative contre le",
+            "url": "https://www.udc.ch/campagnes/apercu/initiative-populaire-federale-stopper-le-mitage-pour-un-developpement-durable-du-milieu-bati-initiative-contre-le-mitage/texte-de-linitiative/"
+          },
+          {
+            "docs": 1,
+            "ngram": "sur les allocations pour perte de gain en cas de service et de",
+            "url": "https://droitactif.ch/recherche.php?cleID=65"
+          }
+        ],
+        "titles_token_sequence": {
+          "examples": [],
+          "titles": 0
+        },
+        "titles_verbatim": {
+          "examples": [],
+          "titles": 0
+        }
+      },
+      "it": {
+        "distinct_titles": 338,
+        "hit_ngrams_title_only": 6,
+        "hit_ngrams_touching_template": 0,
+        "max_template_tokens_in_hit": 0,
+        "prompt_ngrams": 21223,
+        "prompts": 1594,
+        "prompts_with_hit": 9,
+        "prompts_with_template_hits": 0,
+        "prompts_with_title_only_hits": 9,
+        "sample": {
+          "bytes_fetched": 161406176,
+          "config": "ita_Latn",
+          "row_groups": [
+            3,
+            4,
+            7,
+            8,
+            11,
+            15,
+            18,
+            19,
+            24,
+            33,
+            34,
+            40,
+            41,
+            42,
+            43,
+            46,
+            53,
+            54,
+            56,
+            58,
+            60,
+            61,
+            67,
+            69,
+            73,
+            74,
+            86,
+            87,
+            98,
+            100,
+            110,
+            111,
+            112,
+            113,
+            114,
+            116,
+            122,
+            132,
+            133,
+            135,
+            146,
+            148,
+            149,
+            150,
+            153,
+            154,
+            156,
+            164,
+            171,
+            172,
+            175,
+            178,
+            179,
+            181,
+            183,
+            188,
+            189,
+            190,
+            192,
+            198,
+            207,
+            209,
+            210,
+            217,
+            218,
+            220,
+            222,
+            223,
+            224,
+            227,
+            229,
+            230,
+            236,
+            239,
+            242,
+            243,
+            248,
+            252,
+            272,
+            275,
+            278,
+            280,
+            285,
+            287,
+            288,
+            289,
+            294,
+            295,
+            298,
+            300,
+            301,
+            305,
+            306,
+            311,
+            312,
+            313,
+            318,
+            319,
+            320,
+            328
+          ],
+          "row_ranges": [
+            [
+              3000,
+              4000
+            ],
+            [
+              4000,
+              5000
+            ],
+            [
+              7000,
+              8000
+            ],
+            [
+              8000,
+              9000
+            ],
+            [
+              11000,
+              12000
+            ],
+            [
+              15000,
+              16000
+            ],
+            [
+              18000,
+              19000
+            ],
+            [
+              19000,
+              20000
+            ],
+            [
+              24000,
+              25000
+            ],
+            [
+              33000,
+              34000
+            ],
+            [
+              34000,
+              35000
+            ],
+            [
+              40000,
+              41000
+            ],
+            [
+              41000,
+              42000
+            ],
+            [
+              42000,
+              43000
+            ],
+            [
+              43000,
+              44000
+            ],
+            [
+              46000,
+              47000
+            ],
+            [
+              53000,
+              54000
+            ],
+            [
+              54000,
+              55000
+            ],
+            [
+              56000,
+              57000
+            ],
+            [
+              58000,
+              59000
+            ],
+            [
+              60000,
+              61000
+            ],
+            [
+              61000,
+              62000
+            ],
+            [
+              67000,
+              68000
+            ],
+            [
+              69000,
+              70000
+            ],
+            [
+              73000,
+              74000
+            ],
+            [
+              74000,
+              75000
+            ],
+            [
+              86000,
+              87000
+            ],
+            [
+              87000,
+              88000
+            ],
+            [
+              98000,
+              99000
+            ],
+            [
+              100000,
+              101000
+            ],
+            [
+              110000,
+              111000
+            ],
+            [
+              111000,
+              112000
+            ],
+            [
+              112000,
+              113000
+            ],
+            [
+              113000,
+              114000
+            ],
+            [
+              114000,
+              115000
+            ],
+            [
+              116000,
+              117000
+            ],
+            [
+              122000,
+              123000
+            ],
+            [
+              132000,
+              133000
+            ],
+            [
+              133000,
+              134000
+            ],
+            [
+              135000,
+              136000
+            ],
+            [
+              146000,
+              147000
+            ],
+            [
+              148000,
+              149000
+            ],
+            [
+              149000,
+              150000
+            ],
+            [
+              150000,
+              151000
+            ],
+            [
+              153000,
+              154000
+            ],
+            [
+              154000,
+              155000
+            ],
+            [
+              156000,
+              157000
+            ],
+            [
+              164000,
+              165000
+            ],
+            [
+              171000,
+              172000
+            ],
+            [
+              172000,
+              173000
+            ],
+            [
+              175000,
+              176000
+            ],
+            [
+              178000,
+              179000
+            ],
+            [
+              179000,
+              180000
+            ],
+            [
+              181000,
+              182000
+            ],
+            [
+              183000,
+              184000
+            ],
+            [
+              188000,
+              189000
+            ],
+            [
+              189000,
+              190000
+            ],
+            [
+              190000,
+              191000
+            ],
+            [
+              192000,
+              193000
+            ],
+            [
+              198000,
+              199000
+            ],
+            [
+              207000,
+              208000
+            ],
+            [
+              209000,
+              210000
+            ],
+            [
+              210000,
+              211000
+            ],
+            [
+              217000,
+              218000
+            ],
+            [
+              218000,
+              219000
+            ],
+            [
+              220000,
+              221000
+            ],
+            [
+              222000,
+              223000
+            ],
+            [
+              223000,
+              224000
+            ],
+            [
+              224000,
+              225000
+            ],
+            [
+              227000,
+              228000
+            ],
+            [
+              229000,
+              230000
+            ],
+            [
+              230000,
+              231000
+            ],
+            [
+              236000,
+              237000
+            ],
+            [
+              239000,
+              240000
+            ],
+            [
+              242000,
+              243000
+            ],
+            [
+              243000,
+              244000
+            ],
+            [
+              248000,
+              249000
+            ],
+            [
+              252000,
+              253000
+            ],
+            [
+              272000,
+              273000
+            ],
+            [
+              275000,
+              276000
+            ],
+            [
+              278000,
+              279000
+            ],
+            [
+              280000,
+              281000
+            ],
+            [
+              285000,
+              286000
+            ],
+            [
+              287000,
+              288000
+            ],
+            [
+              288000,
+              289000
+            ],
+            [
+              289000,
+              290000
+            ],
+            [
+              294000,
+              295000
+            ],
+            [
+              295000,
+              296000
+            ],
+            [
+              298000,
+              299000
+            ],
+            [
+              300000,
+              301000
+            ],
+            [
+              301000,
+              302000
+            ],
+            [
+              305000,
+              306000
+            ],
+            [
+              306000,
+              307000
+            ],
+            [
+              311000,
+              312000
+            ],
+            [
+              312000,
+              313000
+            ],
+            [
+              313000,
+              314000
+            ],
+            [
+              318000,
+              319000
+            ],
+            [
+              319000,
+              320000
+            ],
+            [
+              320000,
+              321000
+            ],
+            [
+              328000,
+              329000
+            ]
+          ],
+          "shard": "data/ita_Latn/train/004_00008.parquet",
+          "shard_row_groups": 330,
+          "shard_rows": 329125,
+          "shard_sha256": "80c3a5053b0ae3def764a7219cf5511dbdda5eba57d473c66c3b942e8ab0ef12",
+          "shard_url": "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/af9c13333eb981300149d5ca60a8e9d659b276b9/data/ita_Latn/train/004_00008.parquet",
+          "shards_in_config": 85
+        },
+        "sample_docs": 100000,
+        "sample_tokens": 57667888,
+        "source_host_docs": {
+          "docs": 7,
+          "urls": [
+            "https://www.admin.ch/opc/it/classified-compilation/19110027/index.html",
+            "https://www.are.admin.ch/are/it/home/sviluppo-sostenibile/programmi-e-progetti/programmaincentivazione/2020-2021.html",
+            "https://www.bakom.admin.ch/bakom/it/pagina-iniziale/apparecchi-impianti/apparecchi-non-conformi/trasmissione-di-dati-wlan-rlan/alfa-network-deluxe-awus036h.html",
+            "https://www.bk.admin.ch/ch/i/pore/vi/vis133t.html",
+            "https://www.blv.admin.ch/blv/it/home/lebensmittel-und-ernaehrung/lebensmittelsicherheit/verantwortlichkeiten.html",
+            "https://www.eda.admin.ch/eda/it/dfae/dfae/organizzazione-dfae/departementsvorsteher/presidenza-2022.html",
+            "https://www.faq.bag.admin.ch/covid/it/faq-category-node/7122/76824"
+          ]
+        },
+        "template_examples": [],
+        "title_only_examples": [
+          {
+            "docs": 1,
+            "ngram": "di perdita di guadagno per chi presta servizio e in caso di maternità",
+            "url": "http://accessrailsolution.com/Assicurazione%20Di%20Maternit%C3%A0"
+          },
+          {
+            "docs": 1,
+            "ngram": "federale sulle indennità di perdita di guadagno per chi presta servizio e in",
+            "url": "http://accessrailsolution.com/Assicurazione%20Di%20Maternit%C3%A0"
+          },
+          {
+            "docs": 1,
+            "ngram": "indennità di perdita di guadagno per chi presta servizio e in caso di",
+            "url": "http://accessrailsolution.com/Assicurazione%20Di%20Maternit%C3%A0"
+          },
+          {
+            "docs": 1,
+            "ngram": "legge federale sulle indennità di perdita di guadagno per chi presta servizio e",
+            "url": "http://accessrailsolution.com/Assicurazione%20Di%20Maternit%C3%A0"
+          },
+          {
+            "docs": 1,
+            "ngram": "per il matrimonio e la famiglia no agli svantaggi per le coppie sposate",
+            "url": "https://ilpaese.ch/dichiarazione-fiscale-in-futuro-si-cambiera/"
+          },
+          {
+            "docs": 1,
+            "ngram": "sulle indennità di perdita di guadagno per chi presta servizio e in caso",
+            "url": "http://accessrailsolution.com/Assicurazione%20Di%20Maternit%C3%A0"
+          }
+        ],
+        "titles_token_sequence": {
+          "examples": [],
+          "titles": 0
+        },
+        "titles_verbatim": {
+          "examples": [],
+          "titles": 0
+        }
+      }
+    },
+    "ngram": 13,
+    "revision": "af9c13333eb981300149d5ca60a8e9d659b276b9",
+    "seed": 0,
+    "tokeniser": "Python re \\w+ (Unicode), each match lowercased"
+  },
+  "domains": {
+    "blocklists": [
+      {
+        "distinct_hosts": 487621,
+        "exact_matches": {
+          "admin.ch": false,
+          "bk.admin.ch": false,
+          "fedlex.admin.ch": false,
+          "swissvotes.ch": false,
+          "www.admin.ch": false,
+          "www.bk.admin.ch": false,
+          "www.swissvotes.ch": false
+        },
+        "file": "fw1_domains.txt",
+        "lines": 487666,
+        "repo": "swiss-ai/robots-txt-blocked-domains-english",
+        "revision": "e479ab5a6adc7543837a1a5722af3910cc6b4e72",
+        "sha256": "9b23b50527b9babcac0b69c76ec80a30ff89bd740d644deb407ccbf63ffc16ba",
+        "source_hosts_listed": [],
+        "url": "https://huggingface.co/datasets/swiss-ai/robots-txt-blocked-domains-english/resolve/main/fw1_domains.txt"
+      },
+      {
+        "distinct_hosts": 333968,
+        "exact_matches": {
+          "admin.ch": false,
+          "bk.admin.ch": false,
+          "fedlex.admin.ch": false,
+          "swissvotes.ch": false,
+          "www.admin.ch": false,
+          "www.bk.admin.ch": false,
+          "www.swissvotes.ch": false
+        },
+        "file": "fw2_domains.txt",
+        "lines": 333971,
+        "repo": "swiss-ai/robots-txt-blocked-domains-multilingual",
+        "revision": "cf9228759e60e463a2fee5faabeeaa099b11b7b4",
+        "sha256": "bd04a9fbca7410d725ade37337853b0f865842099ef1af582ed1fce779870b1f",
+        "source_hosts_listed": [],
+        "url": "https://huggingface.co/datasets/swiss-ai/robots-txt-blocked-domains-multilingual/resolve/main/fw2_domains.txt"
+      }
+    ],
+    "robots_txt": {
+      "agents": [
+        "CCBot",
+        "GPTBot",
+        "Google-Extended",
+        "ClaudeBot",
+        "*"
+      ],
+      "bytes_fetched": 77594079,
+      "domains_in_file": 792436,
+      "file": "fineweb_robots_compressed.parquet",
+      "hosts_checked": {
+        "admin.ch": false,
+        "bk.admin.ch": false,
+        "fedlex.admin.ch": false,
+        "swissvotes.ch": false,
+        "www.admin.ch": false,
+        "www.bk.admin.ch": false,
+        "www.swissvotes.ch": false
+      },
+      "probes": [
+        {
+          "host": "swissvotes.ch",
+          "note": "no stored robots.txt for this host or its www variant",
+          "robots_domain": null,
+          "url": "https://swissvotes.ch/vote/359.00"
+        },
+        {
+          "host": "www.bk.admin.ch",
+          "note": "no stored robots.txt for this host or its www variant",
+          "robots_domain": null,
+          "url": "https://www.bk.admin.ch/de/details-volksinitiativen?voteNumber=359"
+        },
+        {
+          "host": "www.admin.ch",
+          "note": "no stored robots.txt for this host or its www variant",
+          "robots_domain": null,
+          "url": "https://www.admin.ch/gov/de/start/dokumentation/abstimmungen.html"
+        }
+      ],
+      "repo": "swiss-ai/fineweb-robots-txt-files-compressed",
+      "revision": "bad9d15330c8404136706c01be8ee3ef41e5b852",
+      "sha256": "81e87732617b8925ad34b7d5d40a3d112b0ccad22660aedd7ba409bd953a6da5",
+      "source_hosts_stored": {
+        "jobs.admin.ch": [
+          {
+            "content": "User-agent: *\nAllow: /",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "44f3f8eafdf064cf69acb05f23ee4dfc9ab5b3d67d81c64246bc29f7e438789a"
+          }
+        ],
+        "www.bit.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.blw.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.bundesreisezentrale.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /*_newsfilter_*\nDisallow: /*_projectfilter_*\nDisallow: /*_speechfilter_*",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9762789ce48c05123ba6f01b0a70e06625a0e9ff29062b0c747eb3e5552c87e1"
+          }
+        ],
+        "www.dfae.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /*_newsfilter_*\nDisallow: /*_projectfilter_*\nDisallow: /*_speechfilter_*",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9762789ce48c05123ba6f01b0a70e06625a0e9ff29062b0c747eb3e5552c87e1"
+          }
+        ],
+        "www.eda.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /*_newsfilter_*\nDisallow: /*_projectfilter_*\nDisallow: /*_speechfilter_*",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9762789ce48c05123ba6f01b0a70e06625a0e9ff29062b0c747eb3e5552c87e1"
+          }
+        ],
+        "www.edoeb.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.efd.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.ekr.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /abb/\nDisallow: /abb2/\nDisallow: /abb2a/\nDisallow: /abb2x/\nDisallow: /abb_email/\nDisallow: /abba/\nDisallow: /abbb/\nDisallow: /abbbg/\nDisallow: /abbc/\nDisallow: /abbd/\nDisallow: /abbe/\nDisallow: /abbf/\nDisallow: /abbg/\nDisallow: /abbx/\nDisallow: /admin/\nDisallow: /basket/\nDisallow: /basketcustomer/\nDisallow: /captcha/\nDisallow: /cgi-bin/\nDisallow: /data_de/\nDisallow: /data_fr/\nDisallow: /data_gb_20131217/\nDisallow: /data_it/\nDisallow: /data_xx/\nDisallow: /javascripts/\nDisallow: /js/\nDisallow: /logs_internetal/\nDisallow: /mailing/\nDisallow: /styles/\nDisallow: /templates/\nDisallow: /templates_ungebraucht/\nDisallow: /upload/",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "d8c2700127eb98e6d91d2ff5b1f7287add4b49da66b48eaf1d005e2eb400c4e3"
+          }
+        ],
+        "www.esbk.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.fdfa.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /*_newsfilter_*\nDisallow: /*_projectfilter_*\nDisallow: /*_speechfilter_*",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9762789ce48c05123ba6f01b0a70e06625a0e9ff29062b0c747eb3e5552c87e1"
+          }
+        ],
+        "www.meteoschweiz.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /product/output/",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9584954b95c82e1ef07334d591406671f320eba06608e268376072f36f9ad13e"
+          }
+        ],
+        "www.meteosuisse.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /product/output/",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9584954b95c82e1ef07334d591406671f320eba06608e268376072f36f9ad13e"
+          }
+        ],
+        "www.meteosvizzera.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /product/output/",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9584954b95c82e1ef07334d591406671f320eba06608e268376072f36f9ad13e"
+          }
+        ],
+        "www.meteoswiss.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /product/output/",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9584954b95c82e1ef07334d591406671f320eba06608e268376072f36f9ad13e"
+          }
+        ],
+        "www.post2015.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow: /*_newsfilter_*\nDisallow: /*_projectfilter_*\nDisallow: /*_speechfilter_*",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "9762789ce48c05123ba6f01b0a70e06625a0e9ff29062b0c747eb3e5552c87e1"
+          }
+        ],
+        "www.sif.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.wbf.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ],
+        "www.zivi.admin.ch": [
+          {
+            "content": "User-agent: *\nDisallow:",
+            "protocol": "https",
+            "root_allowed": {
+              "*": true,
+              "CCBot": true,
+              "ClaudeBot": true,
+              "GPTBot": true,
+              "Google-Extended": true
+            },
+            "sha256": "3a125e84a637dc3f5442bb6949fa200056f37db4627b4c2a3addc55bbb89b703"
+          }
+        ]
+      }
+    }
+  },
+  "fetched_on": "2026-10-15",
+  "items_sha256": "fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee",
+  "user_agent": "scrutineer/1.0 (+https://github.com/winsznx/scrutineer)"
+}
