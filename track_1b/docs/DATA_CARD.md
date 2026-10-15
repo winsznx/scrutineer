@@ -46,6 +46,13 @@ title from the Federal Chancellery. Nothing in the dataset was written or transl
 language model, except the question templates noted under Annotations.
 
 <!-- scrutineer:begin dataset_stats -->
+6,716 items over 334 decided federal votes (1 Jan 1990 to 27 Sep 2026, 66 of them lost by the Federal Council) plus the 4 votes of 29 Nov 2026.
+
+By family: F1 1,361 · F2 1,330 · F3 1,330 · F4 797 · F5 334 · F6 214 · F7 20 · F8 1,330.
+
+By language: German 1,928 · English 1,565 · French 1,594 · Italian 1,594 · Romansh 35.
+
+`items.jsonl` sha256 `fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee`.
 <!-- scrutineer:end dataset_stats -->
 
 ## Dataset Details
@@ -209,6 +216,7 @@ opt-out lists (see `docs/CONTAMINATION.md`).
   (`docs/CONTAMINATION.md`).
 
 <!-- scrutineer:begin contamination -->
+_Contamination check not run yet._
 <!-- scrutineer:end contamination -->
 
 #### Data Instance Licenses
@@ -243,6 +251,7 @@ Model, run and judge verdict are hidden in a separate key file. The labeller ass
 records a timestamp per row.
 
 <!-- scrutineer:begin human_table -->
+_Human check status: not exported._
 <!-- scrutineer:end human_table -->
 
 #### Annotator Details

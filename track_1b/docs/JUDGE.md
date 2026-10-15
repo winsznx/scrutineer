@@ -65,7 +65,13 @@ Human agreement comes from a blind 20% sample (PRD section 6.3); see `human_chec
 the report.
 
 <!-- scrutineer:begin judge_table -->
+| Run | Judged items | By reason | F6 parser vs judge agreement |
+|---|--:|---|--:|
+| R1 | 0 |  | n/a (n=0) |
+| R2 | 0 |  | n/a (n=0) |
+| R3 | 0 |  | n/a (n=0) |
 <!-- scrutineer:end judge_table -->
 
 <!-- scrutineer:begin human_table -->
+_Human check status: not exported._
 <!-- scrutineer:end human_table -->

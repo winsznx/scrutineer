@@ -4,6 +4,7 @@ A benchmark that asks Apertus 1.5 what the Swiss people decided in every federal
 1990, in four languages, and shows where and why it gets them wrong.
 
 <!-- scrutineer:begin headline -->
+On F1 (did the vote pass?) in German, French, Italian and English, Apertus 1.5 70B is right on **60.2%** of votes the Federal Council won and **48.5%** of votes it lost, a gap of **11.7 points** (z = 1.69, p = 0.0917; n = 221 and 66 answers). Pre-registered claim C1: **INCONCLUSIVE**.
 <!-- scrutineer:end headline -->
 
 ![F1 accuracy on votes the Federal Council won and lost](docs/figures/fig1_accuracy_gov_lost.png)
