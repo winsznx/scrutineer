@@ -305,6 +305,13 @@ def cmd_site(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+def cmd_export_hf(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.export import export_hf
+
+    print(f"Hugging Face dataset staged in {export_hf(paths, paths.root / 'hf')}")
+    return 0
+
+
 def cmd_replay(args: argparse.Namespace, paths: Paths) -> int:
     from scrutineer.grade.results import load_items
     from scrutineer.replay import agreement, generate, sample_items
@@ -375,6 +382,7 @@ def build_parser() -> argparse.ArgumentParser:
     contamination.add_argument("--skip-corpus", action="store_true", help="domain check only")
 
     sub.add_parser("site", help="build the static site into site/")
+    sub.add_parser("export-hf", help="stage the Hugging Face dataset (items, metadata, responses, card) in hf/")
 
     replay = sub.add_parser("replay", help="replay 100 F1 items on the official 8B weights, compare with R2")
     replay.add_argument("--hosted-run", default="R2")
@@ -396,6 +404,7 @@ HANDLERS: dict[str, Handler] = {
     "report": cmd_report,
     "contamination": cmd_contamination,
     "site": cmd_site,
+    "export-hf": cmd_export_hf,
     "replay": cmd_replay,
 }
 
