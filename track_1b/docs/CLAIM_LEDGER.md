@@ -78,6 +78,27 @@ F1 (de) accuracy on government-lost votes. Given the numbers, the model can appl
 double-majority rule, so the F1 failures are recall failures. Falsifier: F5 accuracy on
 government-lost votes under 80%.
 
+## E1. Exploratory: the answer depends on the language (registered 2026-10-15T13:06Z, after seeing data)
+
+Not pre-registered. Noticed in partial R1 (73 votes) and complete R2 F1 data: in French and
+English, Apertus answers "rejected" to 90 to 98% of F1 questions, against a gold rate of
+about 54%. In German the answers are balanced. The four core languages give the same answer
+on only 20 of 68 votes (R1) and 137 of 310 votes (R2). The report labels every number from
+this analysis as exploratory. Measures, fixed now: per run and language, the share of F1
+answers that say accepted, against the gold share; cross-language agreement, the share of
+votes where all four core languages give the same parsed outcome; and accuracy per language.
+
+## E2. Robustness: option order (registered 2026-10-15T13:06Z, before the test ran)
+
+Hypothesis to rule out: the French and English "rejected" bias is a position effect from
+the answer options as phrased in the templates. Test: the F1 questions of all 334 decided
+votes in de, fr and en, with the two options swapped in both the question and the format
+instruction ("rejected or accepted"), sent to `swiss-ai/apertus-v1.5-8b` with the same
+settings as R2. Readout: the share of "accepted" answers per language under each order, on
+the same items. If swapping the order moves the French/English accepted share by less than
+10 points, the bias is not an option-order effect. If it moves by 20 points or more, option
+order explains a large part of it, and the report says so.
+
 ## Status
 
 - C1: pending (registered 2026-10-15T11:56Z)
