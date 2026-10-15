@@ -190,6 +190,15 @@ def within_instrument(graded: list[Graded]) -> dict[str, Any]:
     return out
 
 
+def era_instrument(graded: list[Graded]) -> dict[str, dict[str, Any]]:
+    """F1 core accuracy for every instrument x era pair (heat map, figure 3)."""
+    groups: dict[str, list[Graded]] = defaultdict(list)
+    for g in _f1_core(graded):
+        groups[f"{g['strata']['instrument']}|{g['strata']['era']}"].append(g)
+    return {key: {k: v for k, v in cell(group).items() if k in {"n", "accuracy"}}
+            for key, group in sorted(groups.items())}
+
+
 def directional_by_lang(graded: list[Graded], items: Items) -> dict[str, dict[str, int]]:
     """Wrong F1 answers per language, split by whether they match the FC recommendation."""
     out: dict[str, dict[str, int]] = {}

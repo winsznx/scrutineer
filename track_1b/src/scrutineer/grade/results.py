@@ -18,6 +18,7 @@ from scrutineer.grade.metrics import (
     breakdown,
     coverage,
     directional_by_lang,
+    era_instrument,
     headline,
     r,
     reasoning_claim_status,
@@ -169,6 +170,7 @@ def assemble(paths: Paths) -> dict[str, Any]:
         per_run[run_id] = {
             "headline": headline(records, items, CLAIM_RUN, run_id),
             "within_instrument": within_instrument(records),
+            "era_instrument": era_instrument(records),
             "directional_by_lang": directional_by_lang(records, items),
             "yes_share": yes_share_errors(records),
             "post_cutoff": abstention(records),
