@@ -18,7 +18,9 @@ for round in $(seq 1 "$max_rounds"); do
     0) echo "$(date -u +%FT%TZ) $run_id complete"; exit 0 ;;
     4) echo "$(date -u +%FT%TZ) $run_id stopped by the budget guard"; exit 4 ;;
     130) echo "$(date -u +%FT%TZ) $run_id stopped by signal"; exit 130 ;;
-    3|5) scripts/wait_for_model.sh "$model" 120 ;;
+    3|5)
+      if [[ " $* " == *" --provider hf "* ]]; then sleep 120   # HF route: back off, no Public AI probe
+      else scripts/wait_for_model.sh "$model" 120; fi ;;
     *) echo "$(date -u +%FT%TZ) $run_id exited with $code"; exit "$code" ;;
   esac
 done

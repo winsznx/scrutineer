@@ -196,3 +196,26 @@ language: one shard per language chosen with a fixed seed from FineWeb-2 revisio
 `af9c1333`, read with HTTP range requests, and nothing stored on disk. Shard paths, row
 ranges and hashes are in `docs/CONTAMINATION.md`. The domain check against Apertus's
 robots.txt opt-out lists covers the full lists, not a sample.
+
+## D19. R1 moved to the official 70B checkpoint on Featherless, through the Hugging Face router
+
+From about 12:50 UTC on 15 October, Public AI's 70B upstream answered every request with
+HTTP 429, for over three hours. On the Hugging Face router, the official
+`swiss-ai/Apertus-v1.5-70B` repo maps to one live provider, featherless-ai. The `publicai`
+provider is not available for it there. A probe returned 65 prompt tokens for the same
+"Say OK." prompt as Public AI, which is consistent with the same chat template.
+
+R1 is therefore run entirely on Featherless (`--provider hf`, model
+`swiss-ai/Apertus-v1.5-70B:featherless-ai`), so the run comes from one deployer. That
+includes re-asking the 287 items Public AI had answered. Those 287 Public AI responses are
+kept unedited as `data/responses/R1_publicai.jsonl` (their records still say `run_id: R1`,
+because response files are never edited). They give a free deployer-agreement check: on the
+first 196 items both deployers answered, the parsed answers agree on 176 (89.8%) at
+temperature 0. Every record carries its provider and endpoint.
+
+Cost: Featherless list price on HF is $0.875 / $2.08 per 1M tokens in / out. The router sends
+no cost header, so spend is computed from token usage at that price and logged to its own
+ledger, `data/spend_ledger_hf.jsonl`, separate from the Public AI credit. Calibration: the
+first 200 items plus 3 probes were estimated at $0.026, and HF billing showed $0.03
+(rounded to the cent). The cap is set assuming the real price may be up to 15% above list.
+The HF account is prepaid ($10.00 credit, automatic recharge off), so no card is charged.
