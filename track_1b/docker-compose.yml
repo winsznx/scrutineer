@@ -1,0 +1,13 @@
+services:
+  scrutineer:
+    build: .
+    image: scrutineer:1.0.0
+    working_dir: /work
+    volumes:
+      - .:/work
+    environment:
+      LLM_NAME: ${LLM_NAME:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      SCRUTINEER_LIVE: ${SCRUTINEER_LIVE:-0}
+      SCRUTINEER_ROOT: /work

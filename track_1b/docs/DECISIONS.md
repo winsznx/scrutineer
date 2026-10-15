@@ -1,0 +1,160 @@
+# Decisions
+
+Every place where the build departs from the PRD, or where the PRD left a question open, is
+recorded here with the reason and what was built instead. Newest decisions at the bottom.
+
+## D1. Repository bootstrapped from the template locally
+
+There was no GitHub repository yet. The template (https://github.com/HackApertus/project-template,
+commit 09f8e9e) was cloned, committed unchanged as the first commit, and the other track
+directories were removed in the second. `track_1b/` keeps the template's files and names.
+The repository is pushed and made public by the author at submission time.
+
+## D2. Environment variable names
+
+`.env` holds the Public AI key as `PUBLIC_AI_API_KEY`. The harness reads `LLM_API_KEY` first,
+as the template requires, and falls back to `PUBLIC_AI_API_KEY`. `LLM_BASE_URL` defaults to
+`https://api.publicai.co/v1`. Every request carries the User-Agent
+`scrutineer/1.0 (+https://github.com/winsznx/scrutineer)`.
+
+## D3. Titles come from the Chancellery's linked data, in all five languages
+
+The PRD planned Swissvotes short titles for DE/FR/EN and scraping Italian and Romansh titles
+from the Chancellery vote pages. Those pages render in the browser from the Federal
+Chancellery's SPARQL cube `https://politics.ld.admin.ch/political-rights/popular-vote/1` on
+LINDAS, so a plain HTTP fetch of a page contains no title. The cube is the pages' own source,
+and it has official titles in German, French, Italian, English and Romansh.
+
+All prompts therefore use the Chancellery's official title in the prompt language. This keeps
+the five language versions of an item parallel. Mixing Swissvotes short titles for DE/FR with
+long official titles for IT would have confounded any language comparison.
+
+Coverage over the 334 decided votes plus 4 post-cutoff votes:
+
+- de, fr, it: 338 of 338. This answers PRD open item 2 for Italian: complete.
+- en: 259 official titles. A further 73 come from the Swissvotes English short title
+  (`titel_kurz_e`, human-written by Année Politique Suisse), recorded per item as
+  `title_source = swissvotes_titel_kurz_e`. For 6 votes neither exists, so the English item is
+  omitted, as the PRD prescribes.
+- rm: 35 votes (31 decided, 4 post-cutoff), all from May 2009 on.
+
+Titles are used verbatim, including the Chancellery's own typos (for example
+"Iniziatiava popolare" for vote 359). No title was translated by a model or by hand. The
+stored file is `data/titles_chancellery.jsonl` instead of the PRD's `titles_it_rm.jsonl`,
+because it holds all five languages.
+
+## D4. F6 includes rejected proposals
+
+As specified, F6 ("was it written into the constitution?") covered only accepted initiatives
+and counter-proposals, so its gold was always "yes" and a model that always says yes would
+score 100%. The build adds an equal number of rejected initiatives and counter-proposals per
+decade, drawn with a fixed seed (20260929), whose gold is "no". F6 has 214 items instead of
+about 180.
+
+## D5. F4 scope kept as written
+
+F4 (majority of cantons) covers mandatory referendums and initiatives, as the PRD says.
+Direct counter-proposals also need the cantons, but they were left out to keep the item set
+as specified. F5 does give the instrument type, so the double-majority rule can be applied.
+
+## D6. Templates: formal register, authored per language
+
+Each language's template was written directly in that language in the formal register
+(Sie / vous / Lei / Vus), which fits the use case of a public-sector assistant. They were
+written by the AI coding assistant that built the harness, not run through machine
+translation, and are not yet checked by a native speaker. The native-quality check from PRD
+section 7 is still owed, most of all for Romansh (Rumantsch Grischun).
+
+## D7. The headline claim's directional clause is tautological on F1
+
+On a government-lost vote the true outcome is, by definition, the opposite of the Federal
+Council's recommendation. With a binary answer, every incorrect answer on those votes
+therefore equals the recommendation, so "at least 70% of wrong answers match the Federal
+Council" is 100% by construction. The claim was registered verbatim and also operationalised
+in a testable way: the share of non-correct answers (incorrect plus not attempted) that
+assert the government's line. See `CLAIM_LEDGER.md`, C1b.
+
+A second problem was found in the data before R1 started. Within each instrument,
+"government lost" is the same thing as "the uncommon outcome": all 15 government-lost
+initiatives were accepted, and all 51 government-lost referendums and counter-proposals were
+rejected. A model that echoes the government and a model that assumes initiatives fail and
+referendums pass give identical answers on this universe. That is registered as C2, and the
+report does not claim "alignment with the government".
+
+## D8. Budget guard without a balance endpoint
+
+Public AI has no wallet-balance endpoint that accepts an API key. `GET /v1/developer/wallet`
+needs an Auth0 login token. The PRD's "stop if the balance endpoint reports under $0.05"
+is built as follows:
+
+1. Every response's billed cost is read from LiteLLM's `x-litellm-response-cost` header (or
+   computed from usage and list price if the header is missing) and appended to
+   `data/spend_ledger.jsonl`.
+2. Before each request, the guard reserves its worst case: prompt length at 2.5 characters
+   per token, plus 80 tokens of chat-template overhead, plus `max_tokens` of output. A
+   request is refused if the reservation could take the starting credit ($2.00) below $0.05.
+3. After a run, ledger entries are reconciled against `POST /v1/developer/billing`, which
+   returns the billed cost per request id and accepts the API key.
+4. The server's own HTTP 402 `insufficient_balance`, sent when the wallet reaches $0.10,
+   stops the run at once.
+
+On any stop the runner writes the remaining item ids to `responses/<run>.remaining.txt` and
+prints them.
+
+## D9. Upstream capacity forced a change in run order and per-run caps
+
+Before R1's first request, the 70B backend behind Public AI answered every request with
+HTTP 429 "Too Many Requests" from the upstream server, after holding it for about 26 s.
+This was not our rate: the gateway allows 100 requests per minute, and a lone request also
+got 429. Those requests were not charged (`x-litellm-response-cost: 0`). R1's first eight
+items were logged as failed and retried later.
+
+To avoid idling, R2 (8B) started first, and R1 started as soon as the 70B answered
+(2026-10-15 12:09 UTC). From then on R1 and R2 ran at the same time on split rate limits
+(R1 60 rpm, R2 35 rpm), so the key stays under 100 rpm. Per-run caps keep R1 first in line
+for the money: R1 $1.20, R2 $0.30. R3 gets what remains and starts only after R1 finishes.
+Within each run, items go in a fixed priority order (F1, F7, F5, F3, F4, F2, F6, F8), so a
+run stopped by the budget still answers the pre-registered claim.
+
+The 8B backend (Jülich) often returns HTTP 400 "no available clients" when saturated. The
+runner treats that body as transient and retries it like a 429.
+
+## D10. Thinking runs grade the visible answer only
+
+For `-thinking` models the reasoning trace is stored in each record but never graded. The
+parser and judge see only the final answer. `max_tokens` is 2,000 as specified, and the
+number of answers truncated by the limit (`finish_reason = length`) is reported per run.
+
+## D11. F6 final grade comes from the judge
+
+PRD section 4.4 grades F6 with "parser + judge". The judge's verdict is the final grade, the
+parser's label is kept, and their agreement is reported as an extra validity check.
+
+## D12. Local replay of the official 8B checkpoint
+
+`swiss-ai/Apertus-v1.5-8B` is gated (accept the licence, then use an HF token). Its weights
+are 18.4 GB, and running it needs swiss-ai's transformers fork, because Apertus 1.5 is not in
+a released transformers version. No HF token was available during the build, and the machine
+had about 25 GB free with an 8 GB judge model on disk. The replay is implemented and runs once
+`HF_TOKEN` is set. Until then the report states that endpoint-to-weights agreement is
+unverified.
+
+## D13. R4 cannot use the Hugging Face router
+
+`GET https://router.huggingface.co/v1/models` (2026-10-15) lists only
+`swiss-ai/Apertus-8B-Instruct-2509` (Apertus 1.0) under provider `publicai`. None of the
+Apertus 1.5 ids is listed, so `--provider hf` cannot reach `apertus-v1.5-70b-thinking`. Under
+the PRD, R4 then needs a Public AI top-up paid from the HF credit, which is the author's
+decision and was not taken during the build. The runner still accepts `--provider hf` for any
+model the router does list.
+
+## D14. Federal Council versus Parliament (PRD open item 3)
+
+In the 334-vote universe, `br-pos` (Federal Council) and `bv-pos` (Parliament) differ in 4
+votes (556, 560, 568, 582). In all four, Parliament made no recommendation (`bv-pos` = 3).
+They never recommend opposite positions. `br-pos` remains the gold for F3.
+
+## D15. Romansh post-cutoff items
+
+Romansh is F1-only per the PRD. The four post-cutoff votes have Romansh titles, so their F7
+items, which ask the same question as F1, were generated in Romansh too: 4 extra items.

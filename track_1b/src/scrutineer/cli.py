@@ -230,6 +230,37 @@ def cmd_verify(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+SYNCED_DOCS = ("README.md", "technical_report.md", "docs/DATA_CARD.md", "docs/CLAIM_LEDGER.md", "docs/JUDGE.md")
+
+
+def cmd_report(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.report.blocks import sync_text
+    from scrutineer.report.figures import render_all
+
+    results = json.loads(paths.results.read_text(encoding="utf-8"))
+    figures = render_all(results, paths.figures)
+    print(f"rendered {len(figures)} figures into {paths.figures}")
+    stale = []
+    for name in SYNCED_DOCS:
+        path = paths.root / name
+        if not path.exists():
+            continue
+        original = path.read_text(encoding="utf-8")
+        updated = sync_text(original, results)
+        if updated == original:
+            continue
+        if args.check:
+            stale.append(name)
+        else:
+            path.write_text(updated, encoding="utf-8")
+            print(f"updated generated numbers in {name}")
+    if stale:
+        print(f"REPORT CHECK FAILED: generated numbers are stale in {', '.join(stale)}; run `make report`",
+              file=sys.stderr)
+        return 1
+    return 0
+
+
 def cmd_export_human_check(args: argparse.Namespace, paths: Paths) -> int:
     from scrutineer.grade.human import export_sample
 
@@ -279,6 +310,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("verify", help="recompute results.json and check it against results.sha256")
 
+    report = sub.add_parser("report", help="render figures and sync generated numbers into the docs")
+    report.add_argument("--check", action="store_true", help="fail instead of writing if docs are stale")
+
     human = sub.add_parser("export-human-check", help="blind 20%% sample of judgements for labelling")
     human.add_argument("--fraction", type=float, default=0.2)
     human.add_argument("--seed", type=int, default=0)
@@ -296,6 +330,7 @@ HANDLERS: dict[str, Handler] = {
     "grade": cmd_grade,
     "verify": cmd_verify,
     "export-human-check": cmd_export_human_check,
+    "report": cmd_report,
 }
 
 
