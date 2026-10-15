@@ -18,6 +18,15 @@ PUBLICAI_PRICES: dict[str, tuple[float, float]] = {
 }
 
 
+# Hugging Face router, provider featherless-ai, as listed for the official
+# swiss-ai/Apertus-v1.5-70B repo on 2026-10-15. The router returns no cost header for this
+# provider, so spend is computed from token usage at these prices.
+HF_FEATHERLESS_PRICES: dict[str, tuple[float, float]] = {
+    "swiss-ai/Apertus-v1.5-70B": (0.875, 2.08),
+}
+HF_DEFAULT_PROVIDER = "featherless-ai"
+
+
 @dataclass(frozen=True)
 class Provider:
     name: str
@@ -53,7 +62,7 @@ def resolve_provider(name: str) -> Provider:
             name="hf",
             base_url="https://router.huggingface.co/v1",
             api_key=os.environ.get("HF_TOKEN"),
-            model_suffix=":publicai",
+            model_suffix=f":{os.environ.get('HF_INFERENCE_PROVIDER', HF_DEFAULT_PROVIDER)}",
         )
     if name == "env":
         env_base = os.environ.get("LLM_BASE_URL")
@@ -63,5 +72,7 @@ def resolve_provider(name: str) -> Provider:
     raise SystemExit(f"unknown provider {name!r}; use publicai, hf or env")
 
 
-def price_for(model: str) -> tuple[float, float] | None:
+def price_for(model: str, provider: str = "publicai") -> tuple[float, float] | None:
+    if provider == "hf":
+        return HF_FEATHERLESS_PRICES.get(model)
     return PUBLICAI_PRICES.get(model)

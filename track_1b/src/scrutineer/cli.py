@@ -121,13 +121,13 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
         run_id=args.run_id,
         model=args.model,
         provider=provider,
-        price=price_for(args.model),
+        price=price_for(args.model, provider.name),
         thinking=thinking,
         workers=args.workers,
         rpm=args.rpm,
         retry_failed=args.retry_failed,
     )
-    if config.price is None and provider.name == "publicai":
+    if config.price is None and provider.name in {"publicai", "hf"}:
         print(f"no list price known for {args.model}; refusing to run unguarded", file=sys.stderr)
         return 2
 
@@ -142,7 +142,7 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     if args.limit:
         selected = selected[: args.limit]
     todo = pending_items(selected, read_records(out), args.retry_failed)
-    ledger = SpendLedger(paths.spend_ledger)
+    ledger = SpendLedger(paths.ledger_for(provider.name))
     guard = BudgetGuard(
         ledger, credit_usd=args.credit_usd, floor_usd=args.floor_usd, run_cap_usd=args.max_usd
     )

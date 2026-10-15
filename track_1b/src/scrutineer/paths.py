@@ -47,6 +47,10 @@ class Paths:
     def spend_ledger(self) -> Path:
         return self.data / "spend_ledger.jsonl"
 
+    def ledger_for(self, provider: str) -> Path:
+        """One ledger per wallet: Public AI credit and Hugging Face credit never mix."""
+        return self.spend_ledger if provider == "publicai" else self.data / f"spend_ledger_{provider}.jsonl"
+
     @property
     def human_check(self) -> Path:
         return self.data / "human_check.csv"

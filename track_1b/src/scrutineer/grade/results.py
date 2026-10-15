@@ -54,7 +54,8 @@ def run_ids(paths: Paths) -> list[str]:
     ids = []
     for meta_path in paths.responses.glob("*.meta.json"):
         run_id = meta_path.name.removesuffix(".meta.json")
-        if run_id.startswith("smoke") or "items_path" in json.loads(meta_path.read_text()):
+        meta = json.loads(meta_path.read_text())
+        if run_id.startswith("smoke") or "items_path" in meta or "comparison_of" in meta:
             continue
         ids.append(run_id)
     return sorted(ids, key=lambda i: (len(i), i))
