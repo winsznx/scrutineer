@@ -61,15 +61,23 @@ scrutineer grade             # folds judgements into data/results.json
 
 ## Agreement
 
-Human agreement comes from a blind 20% sample (PRD section 6.3); see `human_check.csv` and
-the report.
+Human review of a Claude pre-labelled sample. The human saw the pre-label and could
+override. Judge vs human and judge vs Claude are both reported. Claude never saw the
+judge's verdicts.
+
+The sample is a seeded random 20% of R2's judged items (311 of 1,556), exported blind by
+`scrutineer export-human-check --run-id R2`. Claude (Fable 5.1) labelled every row from the
+same columns the human sees (question, gold facts, response), with no judge verdict, run or
+language. `scrutineer merge-prelabels` adds those labels to `human_check.csv` and writes
+`human_check_review.csv` for the human pass. Because the human saw Claude's label, judge vs
+human is not independent of Claude, and the report says so next to the number.
 
 <!-- scrutineer:begin judge_table -->
 | Run | Judged items | By reason | F6 parser vs judge agreement |
 |---|--:|---|--:|
 | R1 | 0 |  | n/a (n=0) |
-| R2 | 0 |  | n/a (n=0) |
-| R3 | 0 |  | n/a (n=0) |
+| R2 | 5 | unparseable 5 | n/a (n=0) |
+| R3 | 8 | unparseable 8 | n/a (n=0) |
 <!-- scrutineer:end judge_table -->
 
 <!-- scrutineer:begin human_table -->

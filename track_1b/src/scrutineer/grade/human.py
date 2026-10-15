@@ -74,3 +74,32 @@ def export_sample(paths: Paths, fraction: float, seed: int, runs: list[str] | No
                 "judge_grade": entry["judge_grade"],
             })
     return len(sample), len(population)
+
+
+REVIEW_COLUMNS = ("row_id", "question", "gold", "response", "prelabel", "prelabel_note", "human_grade", "labelled_at")
+
+
+def merge_prelabels(paths: Paths) -> int:
+    """Add the blind second rater's labels to human_check.csv and write the review sheet.
+
+    The review sheet carries no judge verdict, run or language, same as the label sheet.
+    """
+    with paths.prelabels.open(encoding="utf-8") as handle:
+        prelabels = {row["row_id"]: row for row in csv.DictReader(handle)}
+    with paths.human_check.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    if {row["row_id"] for row in rows} != set(prelabels):
+        raise SystemExit("prelabel row ids do not match human_check.csv")
+    for row in rows:
+        row["prelabel"] = prelabels[row["row_id"]]["prelabel"].strip()
+        row["prelabel_note"] = prelabels[row["row_id"]].get("prelabel_note", "").strip()
+    columns = [*LABEL_COLUMNS, "prelabel", "prelabel_note"]
+    with paths.human_check.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows({column: row.get(column, "") for column in columns} for row in rows)
+    with paths.human_check_review.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=REVIEW_COLUMNS)
+        writer.writeheader()
+        writer.writerows({column: row.get(column, "") for column in REVIEW_COLUMNS} for row in rows)
+    return len(rows)

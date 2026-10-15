@@ -111,6 +111,43 @@ def human_agreement(paths: Paths) -> dict[str, Any]:
     }
 
 
+def second_rater_agreement(paths: Paths) -> dict[str, Any]:
+    """Judge versus the blind Claude pre-labels (and versus the human, once labelled)."""
+    if not paths.prelabels.exists() or not paths.human_check_key.exists():
+        return {"status": "not_available"}
+    with paths.human_check_key.open(encoding="utf-8") as handle:
+        key = {row["row_id"]: row for row in csv.DictReader(handle)}
+    with paths.prelabels.open(encoding="utf-8") as handle:
+        claude = {row["row_id"]: row["prelabel"].strip() for row in csv.DictReader(handle)}
+    human: dict[str, str] = {}
+    if paths.human_check.exists():
+        with paths.human_check.open(encoding="utf-8") as handle:
+            human = {row["row_id"]: row.get("human_grade", "").strip().lower() for row in csv.DictReader(handle)}
+
+    def summarise(pairs: list[tuple[str, str]]) -> dict[str, Any]:
+        return {
+            "n": len(pairs),
+            "raw_agreement": r(sum(a == b for a, b in pairs) / len(pairs)) if pairs else None,
+            "cohen_kappa": r(cohen_kappa([p[0] for p in pairs], [p[1] for p in pairs])) if pairs else None,
+        }
+
+    def by_group(pairs: list[tuple[str, str, str, str]], index: int) -> dict[str, Any]:
+        groups: dict[str, list[tuple[str, str]]] = defaultdict(list)
+        for pair in pairs:
+            groups[pair[index]].append((pair[0], pair[1]))
+            groups["all"].append((pair[0], pair[1]))
+        return {name: summarise(group) for name, group in sorted(groups.items())}
+
+    judge_claude = [(key[i]["judge_grade"], claude[i], key[i]["family"], key[i]["lang"]) for i in key if i in claude]
+    valid = {"correct", "incorrect", "not_attempted"}
+    claude_human = [(claude[i], human[i], key[i]["family"], key[i]["lang"]) for i in key if human.get(i) in valid]
+    return {
+        "rater": "Claude (Fable 5.1), blind to judge verdicts, run and language",
+        "judge_vs_claude": {"by_family": by_group(judge_claude, 2), "by_lang": by_group(judge_claude, 3)},
+        "claude_vs_human": by_group(claude_human, 2) if claude_human else {"status": "awaiting_labels"},
+    }
+
+
 def judge_summary(paths: Paths, graded: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for run_id, records in graded.items():
@@ -235,6 +272,7 @@ def assemble(paths: Paths) -> dict[str, Any]:
         "robustness": robustness(paths, graded),
         "judge": judge_summary(paths, graded),
         "human_check": human_agreement(paths),
+        "second_rater_agreement": second_rater_agreement(paths),
         "contamination": _optional_json(paths.docs / "contamination.json"),
         "replay": _optional_json(paths.data / "replay" / "agreement.json"),
     }

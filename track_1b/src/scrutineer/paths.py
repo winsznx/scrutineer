@@ -56,6 +56,14 @@ class Paths:
         return self.data / "human_check.csv"
 
     @property
+    def human_check_review(self) -> Path:
+        return self.data / "human_check_review.csv"
+
+    @property
+    def prelabels(self) -> Path:
+        return self.data / "claude_prelabels.csv"
+
+    @property
     def human_check_key(self) -> Path:
         return self.data / "human_check_key.csv"
 

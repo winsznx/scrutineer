@@ -296,6 +296,13 @@ def cmd_export_human_check(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+def cmd_merge_prelabels(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.human import merge_prelabels
+
+    print(f"merged {merge_prelabels(paths)} pre-labels; review sheet {paths.human_check_review}")
+    return 0
+
+
 def cmd_contamination(args: argparse.Namespace, paths: Paths) -> int:
     from scrutineer.contamination import run, write_report
 
@@ -399,6 +406,7 @@ def build_parser() -> argparse.ArgumentParser:
     contamination.add_argument("--seed", type=int, default=0)
     contamination.add_argument("--skip-corpus", action="store_true", help="domain check only")
 
+    sub.add_parser("merge-prelabels", help="add Claude pre-labels to the hand-check sheet and export the review sheet")
     sub.add_parser("site", help="build the static site into site/")
     sub.add_parser("export-hf", help="stage the Hugging Face dataset (items, metadata, responses, card) in hf/")
 
@@ -422,6 +430,7 @@ HANDLERS: dict[str, Handler] = {
     "report": cmd_report,
     "contamination": cmd_contamination,
     "site": cmd_site,
+    "merge-prelabels": cmd_merge_prelabels,
     "export-hf": cmd_export_hf,
     "replay": cmd_replay,
 }
