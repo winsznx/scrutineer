@@ -209,8 +209,9 @@ def _method(data: SiteData) -> str:
           f"Federal Chancellery titles from LINDAS: German, French and Italian for every vote, Romansh where the "
           f"Chancellery publishes it (since 2009), and English where it publishes one. For "
           f"{count(data.en_fallback_titles)} more votes the English title is the Swissvotes short title, and votes "
-          f"with neither get no English items. No model translated anything. There are {items} items on {decided} decided "
-          f"votes and {upcoming} votes that have not been held yet, where the right answer is to say so.")
+          f"with neither get no English items. No model translated anything. There are {items} items on "
+          f"{decided} decided votes and {upcoming} votes that have not been held yet, where the right answer is "
+          f"to say so.")
     p2 = ("A deterministic parser reads each answer in its own language: accepted, rejected, a percentage, or "
           "I don't know. Answers it cannot read, and the two free-text question families, go to a local "
           f"open-weights judge, Qwen2.5-7B-Instruct. Apertus never grades its own answers. In run {CLAIM_RUN} the "
