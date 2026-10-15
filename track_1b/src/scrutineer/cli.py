@@ -249,7 +249,8 @@ def cmd_verify(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
-SYNCED_DOCS = ("README.md", "technical_report.md", "docs/DATA_CARD.md", "docs/CLAIM_LEDGER.md", "docs/JUDGE.md")
+SYNCED_DOCS = ("README.md", "technical_report.md", "CONTRIBUTIONS.md", "docs/DATA_CARD.md", "docs/CLAIM_LEDGER.md",
+               "docs/JUDGE.md")
 
 
 def cmd_report(args: argparse.Namespace, paths: Paths) -> int:
