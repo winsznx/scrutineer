@@ -8,7 +8,7 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 dir="$root/models/qwen2.5-7b-instruct"
 repo="Qwen/Qwen2.5-7B-Instruct-GGUF"
-revision="${JUDGE_REVISION:-main}"
+revision="${JUDGE_REVISION:-bb5d59e06d9551d752d08b292a50eb208b07ab1f}"
 shards=(qwen2.5-7b-instruct-q8_0-00001-of-00003.gguf
         qwen2.5-7b-instruct-q8_0-00002-of-00003.gguf
         qwen2.5-7b-instruct-q8_0-00003-of-00003.gguf)
