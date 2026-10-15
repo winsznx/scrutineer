@@ -6,6 +6,9 @@ set -euo pipefail
 model="$1"
 interval="${2:-180}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
+for env_file in "$root/.env" "$root/../.env"; do
+  if [ -f "$env_file" ]; then set -a; . "$env_file"; set +a; fi
+done
 key="${LLM_API_KEY:-${PUBLIC_AI_API_KEY:?set LLM_API_KEY}}"
 headers="$(mktemp)"
 trap 'rm -f "$headers"' EXIT

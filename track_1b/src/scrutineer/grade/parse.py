@@ -28,6 +28,8 @@ PARSER_VERSION = "1.0.0"
 NEGATION_WINDOW = 3
 LEADING_ANSWER_TOKENS = 4
 
+APERTUS_THINK_OPEN = "<|inner_prefix|>"
+APERTUS_THINK_CLOSE = "<|inner_suffix|>"
 _THINK_BLOCK = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 _OPEN_THINK = re.compile(r"^.*</think>", re.DOTALL | re.IGNORECASE)
 _TOKEN = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
@@ -67,6 +69,14 @@ def fold(text: str) -> str:
 
 
 def strip_reasoning(text: str) -> str:
+    """Remove thinking traces: `<think>...</think>` and Apertus' `<|inner_prefix|>...<|inner_suffix|>`.
+
+    A trace that never closes (output cut at `max_tokens`) leaves no visible answer.
+    """
+    if APERTUS_THINK_OPEN in text:
+        _, _, after_open = text.partition(APERTUS_THINK_OPEN)
+        _, closed, answer = after_open.partition(APERTUS_THINK_CLOSE)
+        return answer if closed else ""
     text = _THINK_BLOCK.sub(" ", text)
     if "</think>" in text.lower():
         text = _OPEN_THINK.sub(" ", text)

@@ -23,6 +23,7 @@ from typing import Any
 
 import httpx
 
+from scrutineer.grade.parse import APERTUS_THINK_CLOSE, APERTUS_THINK_OPEN
 from scrutineer.run.budget import BudgetExhausted, BudgetGuard, cost_usd, estimate_prompt_tokens
 from scrutineer.run.providers import USER_AGENT, Provider
 
@@ -65,6 +66,10 @@ class RunConfig:
             "provider": self.provider.name,
             "endpoint": self.provider.chat_url,
             "thinking": self.thinking,
+            "thinking_switch": (
+                "chat_template_kwargs.enable_thinking" if self.thinking and not self.model.endswith("-thinking")
+                else ("model id" if self.thinking else None)
+            ),
             "temperature": self.temperature,
             "seed": self.seed,
             "max_tokens": {f: self.max_tokens(f) for f in FAMILY_PRIORITY},
@@ -110,13 +115,17 @@ class RunState:
 
 
 def request_body(config: RunConfig, item: dict[str, Any]) -> dict[str, Any]:
-    return {
+    body: dict[str, Any] = {
         "model": config.provider.wire_model(config.model),
         "messages": [{"role": "user", "content": item["prompt"]}],
         "temperature": config.temperature,
         "seed": config.seed,
         "max_tokens": config.max_tokens(item["family"]),
     }
+    if config.thinking and not config.model.endswith("-thinking"):
+        # Apertus' chat template switch; the hosted `-thinking` ids set the same flag server-side.
+        body["chat_template_kwargs"] = {"enable_thinking": True}
+    return body
 
 
 def body_sha256(body: dict[str, Any]) -> str:
@@ -166,11 +175,15 @@ def _now() -> str:
 
 
 def _extract(payload: dict[str, Any]) -> tuple[str, str | None, str | None]:
+    """Verbatim content, the thinking trace if the server or the template exposes one, finish reason."""
     choice = payload["choices"][0]
     message = choice.get("message") or {}
     content = message.get("content") or ""
     extra = message.get("provider_specific_fields") or {}
     reasoning = message.get("reasoning_content") or message.get("reasoning") or extra.get("reasoning")
+    if reasoning is None and APERTUS_THINK_OPEN in content:
+        trace = content.partition(APERTUS_THINK_OPEN)[2]
+        reasoning = trace.partition(APERTUS_THINK_CLOSE)[0]
     return content, reasoning, choice.get("finish_reason")
 
 

@@ -1,3 +1,60 @@
+# Scrutineer
+
+A benchmark that asks Apertus 1.5 what the Swiss people decided in every federal vote since
+1990, in four languages, and shows where and why it gets them wrong.
+
+<!-- scrutineer:begin headline -->
+<!-- scrutineer:end headline -->
+
+![F1 accuracy on votes the Federal Council won and lost](docs/figures/fig1_accuracy_gov_lost.png)
+
+**Dataset** https://huggingface.co/datasets/winsznx/scrutineer ·
+**Report** [Scrutineer_Report.pdf](Scrutineer_Report.pdf) ·
+**Site** https://winsznx.github.io/scrutineer/
+
+## Quickstart for judges
+
+```bash
+git clone https://github.com/winsznx/scrutineer && cd scrutineer/track_1b
+make run          # Docker; about 5 minutes on a laptop, most of it the image build. No API key.
+```
+
+`make run` rebuilds all 6,716 items from the pinned Swissvotes CSV and checks them byte for
+byte, replays grading from the stored model responses and judge verdicts, recomputes
+`data/results.json` and compares its sha256 with `data/results.sha256`, regenerates the
+figures and checks that every number quoted in this README, the report and the data card is
+current, then rebuilds the site. Any mismatch exits non-zero.
+
+To also query a live model, set the template's variables and opt in:
+
+```bash
+LLM_API_KEY=... LLM_NAME=swiss-ai/apertus-v1.5-8b SCRUTINEER_LIVE=1 make run   # +50 live items
+```
+
+Evaluating another model on the full set takes two commands with the `scrutineer` CLI
+(`pip install -e .`):
+
+```bash
+scrutineer run --run-id mymodel --provider env --model <model id>   # any OpenAI-compatible endpoint
+scrutineer grade && scrutineer report
+```
+
+| Where | What |
+|---|---|
+| `technical_report.md`, `Scrutineer_Report.pdf` | the report |
+| `data/items.jsonl` | the evaluation set (6,716 items) |
+| `data/responses/`, `data/judgements/` | verbatim model answers and judge verdicts |
+| `data/results.json` | every number in the report |
+| `docs/CLAIM_LEDGER.md` | the claim, registered before the first model call |
+| `docs/DATA_CARD.md`, `docs/JUDGE.md`, `docs/CONTAMINATION.md`, `docs/DECISIONS.md` | documentation |
+| `src/scrutineer/` | the package: `build`, `run`, `grade`, `report`, `site` |
+
+Licences: code Apache-2.0, dataset CDLA-Permissive-2.0, report CC-BY-4.0. Source data:
+Swissvotes (Année Politique Suisse, Universität Bern, CC BY 4.0) and the Swiss Federal
+Chancellery.
+
+---
+
 # Challenge 1B: Swiss Voices
 
 This track 1 is focused on improving the multimodal Apertus v1.5 8B and 70B models. There are two different paths. Path B focuses on localising Apertus to the languages, dialects, knowledge and values of Switzerland. Submissions can focus either on the 8B or 70B model.

@@ -158,3 +158,31 @@ They never recommend opposite positions. `br-pos` remains the gold for F3.
 
 Romansh is F1-only per the PRD. The four post-cutoff votes have Romansh titles, so their F7
 items, which ask the same question as F1, were generated in Romansh too: 4 extra items.
+
+## D16. R3 started while R1 waited on the 70B backend
+
+From about 12:27 UTC on 15 October the 70B upstream returned HTTP 429 to every request,
+whether we ran 24, 16 or 4 workers. R1 runs under `scripts/supervise_run.sh`, which waits for
+the model to answer again and resumes with failed items retried. To use the time, R3 (8B
+thinking) started at 12:42 UTC with a cap of $0.40. The three caps add up to $1.90
+(R1 $1.20, R2 $0.30, R3 $0.40), so however the runs interleave, R1 keeps its budget and the
+wallet stays above the server's $0.10 cut-off. The run order the PRD asks for (R1, then R2,
+then R3) is kept as a budget priority, not as a strict time order.
+
+## D17. R3 enables thinking through the chat template, not the `-thinking` model id
+
+`swiss-ai/apertus-v1.5-8b-thinking` and `-70b-thinking` appear in Public AI's `/v1/models`,
+but on 15 October every request to them returned HTTP 400 "Invalid model name". The hosted
+`-thinking` ids are the base model served with the chat-template switch
+`enable_thinking: true` (Apertus 1.5 model card). R3 therefore calls
+`swiss-ai/apertus-v1.5-8b` with `"chat_template_kwargs": {"enable_thinking": true}` in the
+request body. That is the same switch set per request, and it is recorded in
+`R3.meta.json` (`thinking_switch`). The 28 failed attempts against the dead alias were moved,
+unedited, to `data/responses/attic/R3-thinking-alias.*`.
+
+With the switch on, the model writes a reasoning trace between `<|inner_prefix|>` and
+`<|inner_suffix|>`, followed by the answer. On the first items it wrote a 240 to 690 token
+trace for English prompts and an empty trace for German, French and Italian prompts, on the
+same backend. This is model behaviour, not a harness setting, and the report gives trace
+length per language. Responses are stored verbatim. The parser grades only the text after
+`<|inner_suffix|>`, and a trace cut off by `max_tokens` counts as no answer.

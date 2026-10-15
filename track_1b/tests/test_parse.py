@@ -56,3 +56,13 @@ def test_reasoning_block_is_ignored() -> None:
 
 def test_unterminated_reasoning_prefix_is_ignored() -> None:
     assert parse_label("thinking about accepted ...</think> Rejected.", "en", "F1") == "rejected"
+
+
+def test_apertus_thinking_trace_is_stripped() -> None:
+    text = "<|inner_prefix|>\nIch glaube, sie wurde angenommen.\n<|inner_suffix|>abgelehnt"
+    assert parse_label(text, "de", "F1") == "rejected"
+
+
+def test_truncated_apertus_trace_has_no_answer() -> None:
+    assert strip_reasoning("<|inner_prefix|>still thinking about accepted") == ""
+    assert parse_label("<|inner_prefix|>still thinking about accepted", "en", "F1") == "unparseable"
