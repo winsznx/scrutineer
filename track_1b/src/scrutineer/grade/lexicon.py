@@ -25,8 +25,8 @@ POSITIVE: Final[dict[str, tuple[str, ...]]] = {
         "inserito", "inserita", "inseriti", "inserite",
     ),
     "en": (
-        "accepted", "accept", "acceptance", "approved", "approve", "approval", "passed",
-        "adopted", "written", "incorporated", "enshrined",
+        "accepted", "accept", "accepting", "acceptance", "approved", "approve", "approving",
+        "approval", "passed", "adopted", "written", "incorporated", "enshrined",
     ),
     "rm": (
         "acceptà", "acceptada", "acceptads", "acceptadas", "acceptar", "acceptaziun",
@@ -49,7 +49,10 @@ NEGATIVE: Final[dict[str, tuple[str, ...]]] = {
         "rifiutato", "rifiutata", "rifiutati", "rifiutate", "rifiuto", "bocciato",
         "bocciata", "bocciati", "bocciate",
     ),
-    "en": ("rejected", "reject", "rejection", "refused", "defeated", "voted down", "turned down"),
+    "en": (
+        "rejected", "reject", "rejecting", "rejection", "refused", "defeated", "voted down",
+        "turned down",
+    ),
     "rm": (
         "refusà", "refusada", "refusads", "refusadas", "refusar", "refus", "rejectà",
         "rejectada",
@@ -121,6 +124,34 @@ ABSTAIN: Final[dict[str, tuple[str, ...]]] = {
         "na sai betg", "na sa betg", "savais betg", "sai betg", "betg enconuschent",
         "anc betg", "na poss betg", "nagina infurmaziun", "naginas infurmaziuns",
         "en il futur",
+    ),
+}
+
+# Abstentions with words in between ("weiss ich leider nicht", "na sai jau betg").
+# Applied to accent-folded text, where ß is already "ss".
+ABSTAIN_PATTERNS: Final[dict[str, tuple[str, ...]]] = {
+    "de": (
+        r"\bweiss\b(?:\s+\w+){0,3}\s+nicht\b",
+        r"\bkann\b(?:\s+\w+){0,4}\s+nicht\s+(?:sagen|beantworten|angeben)\b",
+        r"\bkeine\b(?:\s+\w+){0,2}\s+(?:informationen|angaben|daten|kenntnis)\b",
+    ),
+    "fr": (
+        r"\bne\b(?:\s+\w+){0,2}\s+(?:sais|connais)\s+pas\b",
+        r"\bne\s+peux\s+pas\b",
+        r"\bpas\s+d\W?(?:information|informations|donnees)\b",
+    ),
+    "it": (
+        r"\bnon\b(?:\s+\w+){0,2}\s+(?:so|conosco)\b",
+        r"\bnon\s+posso\b",
+        r"\bnon\s+ho\b(?:\s+\w+){0,2}\s+informazion[ei]\b",
+    ),
+    "en": (
+        r"\bi\s+(?:do\s+)?not\s+(?:know|have)\b",
+        r"\bcannot\s+(?:say|tell|determine|confirm|provide)\b",
+    ),
+    "rm": (
+        r"\bna\b(?:\s+\w+){0,2}\s+(?:sai|sa|savais|poss|pos)\b",
+        r"\b(?:sai|poss)\b(?:\s+\w+){0,2}\s+betg\b",
     ),
 }
 
