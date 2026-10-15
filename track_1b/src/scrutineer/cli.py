@@ -291,7 +291,7 @@ def cmd_export_human_check(args: argparse.Namespace, paths: Paths) -> int:
     if paths.human_check.exists() and not args.force:
         print(f"{paths.human_check} exists; refusing to overwrite labels (use --force)", file=sys.stderr)
         return 1
-    count, population = export_sample(paths, fraction=args.fraction, seed=args.seed)
+    count, population = export_sample(paths, fraction=args.fraction, seed=args.seed, runs=args.run_id)
     print(f"exported {count} of {population} judged items to {paths.human_check}")
     return 0
 
@@ -392,6 +392,7 @@ def build_parser() -> argparse.ArgumentParser:
     human.add_argument("--fraction", type=float, default=0.2)
     human.add_argument("--seed", type=int, default=0)
     human.add_argument("--force", action="store_true")
+    human.add_argument("--run-id", action="append", help="repeatable; default all runs")
 
     contamination = sub.add_parser("contamination", help="robots.txt opt-outs and 13-gram overlap with FineWeb-2")
     contamination.add_argument("--docs-per-lang", type=int, default=100_000)

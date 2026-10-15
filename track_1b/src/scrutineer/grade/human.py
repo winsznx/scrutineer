@@ -24,10 +24,10 @@ LABEL_COLUMNS = ("row_id", "question", "gold", "response", "human_grade", "label
 KEY_COLUMNS = ("row_id", "run_id", "item_id", "family", "lang", "judge_grade")
 
 
-def _population(paths: Paths) -> list[dict[str, Any]]:
+def _population(paths: Paths, runs: list[str] | None = None) -> list[dict[str, Any]]:
     items = load_items(paths)
     population: list[dict[str, Any]] = []
-    for run_id in run_ids(paths):
+    for run_id in runs or run_ids(paths):
         records = read_records(paths.responses / f"{run_id}.jsonl")
         for item_id, judgement in sorted(read_judgements(paths.judgements / f"{run_id}.jsonl").items()):
             item = items[item_id]
@@ -40,8 +40,8 @@ def _population(paths: Paths) -> list[dict[str, Any]]:
     return population
 
 
-def export_sample(paths: Paths, fraction: float, seed: int) -> tuple[int, int]:
-    population = _population(paths)
+def export_sample(paths: Paths, fraction: float, seed: int, runs: list[str] | None = None) -> tuple[int, int]:
+    population = _population(paths, runs)
     rng = random.Random(seed)
     sample = rng.sample(population, round(len(population) * fraction))
     rng.shuffle(sample)
