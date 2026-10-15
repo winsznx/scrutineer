@@ -1,0 +1,19 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "gguf_repo": "Qwen/Qwen2.5-7B-Instruct-GGUF",
+  "gguf_revision": "bb5d59e06d9551d752d08b292a50eb208b07ab1f",
+  "quantisation": "Q8_0",
+  "shards_sha256": {
+    "qwen2.5-7b-instruct-q8_0-00001-of-00003.gguf": "26e30cb4559f0d9e9e11f34d351292af6f42199ce3fa742b5e7c5af4bc35b0f0",
+    "qwen2.5-7b-instruct-q8_0-00002-of-00003.gguf": "e93856ce0cb05d5abd698eb439c0fea3acd412d9040f5ab7d2d4d088add5287d",
+    "qwen2.5-7b-instruct-q8_0-00003-of-00003.gguf": "8f29c0e4173d4d92d35c52a7c5807c34a3edfe6bb078ea785d145b7d88c16e44"
+  },
+  "gguf_sha256": "30144217273322462d882d2766910b42bea21118180078145c9030dfbb5cae5e",
+  "runtime": "version: 0.6.0 (build 11429, commit d81235049)",
+  "sampling": {
+    "temperature": 0,
+    "seed": 0,
+    "max_tokens": 120
+  },
+  "context": 4096
+}
