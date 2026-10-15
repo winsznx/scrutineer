@@ -158,3 +158,20 @@ def test_priority_order_puts_headline_family_first() -> None:
         {"item_id": "1-F7-de", "anr": "1", "family": "F7", "lang": "de"},
     ]
     assert [i["item_id"] for i in order_items(items)] == ["2-F1-de", "2-F1-fr", "1-F7-de", "1-F8-de"]
+
+
+def test_circuit_breaker_stops_a_dead_endpoint(tmp_path: Path) -> None:
+    runner = run(tmp_path, FakeServer([503] * 1000), make_items(40))
+    assert runner.state.stop_reason is not None and "consecutive" in runner.state.stop_reason
+    assert len(runner.state.failed) < 40
+
+
+def test_billed_cost_header_wins_over_estimate(tmp_path: Path) -> None:
+    def server(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=ok_payload(request), headers={"x-litellm-response-cost": "0.00042"})
+
+    config = RunConfig(run_id="T", model="m", provider=PROVIDER, price=(1.0, 1.0), workers=1, rpm=60_000)
+    guard = BudgetGuard(SpendLedger(tmp_path / "ledger.jsonl"), credit_usd=2.0)
+    runner = Runner(config, guard, tmp_path / "T.jsonl", httpx.MockTransport(server), sleep_base_s=0)
+    asyncio.run(runner.run(make_items(1)))
+    assert read_records(tmp_path / "T.jsonl")["400-F1-de"]["cost_usd"] == pytest.approx(0.00042)

@@ -31,6 +31,8 @@ DEFAULT_MAX_TOKENS = 60
 THINKING_MAX_TOKENS = 2000
 MAX_ATTEMPTS = 5
 RETRYABLE = {408, 409, 425, 429, 500, 502, 503, 504, 520, 522, 524}
+# Consecutive failed items after which the endpoint is treated as down and the run stops.
+CIRCUIT_BREAKER = 16
 
 
 @dataclass(frozen=True)
@@ -96,6 +98,7 @@ class RunState:
     done: set[str] = field(default_factory=set)
     failed: set[str] = field(default_factory=set)
     stop_reason: str | None = None
+    consecutive_failures: int = 0
 
 
 def request_body(config: RunConfig, item: dict[str, Any]) -> dict[str, Any]:
@@ -158,8 +161,18 @@ def _extract(payload: dict[str, Any]) -> tuple[str, str | None, str | None]:
     choice = payload["choices"][0]
     message = choice.get("message") or {}
     content = message.get("content") or ""
-    reasoning = message.get("reasoning_content") or message.get("reasoning")
+    extra = message.get("provider_specific_fields") or {}
+    reasoning = message.get("reasoning_content") or message.get("reasoning") or extra.get("reasoning")
     return content, reasoning, choice.get("finish_reason")
+
+
+def _billed_cost(response: httpx.Response) -> float | None:
+    """LiteLLM reports the exact charge per request in a response header."""
+    raw = response.headers.get("x-litellm-response-cost")
+    try:
+        return float(raw) if raw is not None else None
+    except ValueError:
+        return None
 
 
 class Runner:
@@ -237,7 +250,8 @@ class Runner:
                 content, reasoning, finish = _extract(payload)
                 usage = payload.get("usage") or {}
                 request_id = payload.get("id") or response.headers.get("inference-id")
-                if self.config.price is not None:
+                actual = _billed_cost(response)
+                if actual is None and self.config.price is not None:
                     actual = cost_usd(
                         int(usage.get("prompt_tokens", 0)),
                         int(usage.get("completion_tokens", 0)),
@@ -259,6 +273,7 @@ class Runner:
                     "timestamp": _now(),
                 })
                 self.state.done.add(item["item_id"])
+                self.state.consecutive_failures = 0
                 return
             await self._write({
                 **base,
@@ -270,6 +285,9 @@ class Runner:
                 "timestamp": _now(),
             })
             self.state.failed.add(item["item_id"])
+            self.state.consecutive_failures += 1
+            if self.state.consecutive_failures >= CIRCUIT_BREAKER:
+                raise StopRun(f"{CIRCUIT_BREAKER} consecutive failures, last: HTTP {last_status}")
         finally:
             await self.guard.settle(worst, self.config.run_id, item["item_id"], request_id, actual)
 

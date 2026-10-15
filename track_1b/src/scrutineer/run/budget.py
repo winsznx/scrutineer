@@ -23,6 +23,8 @@ import httpx
 DEFAULT_CREDIT_USD = 2.00
 DEFAULT_FLOOR_USD = 0.05
 CHARS_PER_TOKEN_LOWER_BOUND = 2.5
+# Apertus' chat template wraps a bare user turn in ~65 tokens of scaffolding (measured).
+CHAT_TEMPLATE_OVERHEAD_TOKENS = 80
 
 
 class BudgetExhausted(Exception):
@@ -31,7 +33,7 @@ class BudgetExhausted(Exception):
 
 def estimate_prompt_tokens(prompt: str) -> int:
     """Deliberately high estimate so reservations err on the side of stopping early."""
-    return int(len(prompt) / CHARS_PER_TOKEN_LOWER_BOUND) + 16
+    return int(len(prompt) / CHARS_PER_TOKEN_LOWER_BOUND) + CHAT_TEMPLATE_OVERHEAD_TOKENS
 
 
 def cost_usd(prompt_tokens: int, completion_tokens: int, price: tuple[float, float]) -> float:
