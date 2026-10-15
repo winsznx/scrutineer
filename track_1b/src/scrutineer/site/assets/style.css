@@ -85,7 +85,7 @@ code { font: 400 0.88em/1.4 var(--mono); overflow-wrap: anywhere; }
 }
 .lede { margin: 28px 0 0; max-width: 33em; font: 400 clamp(18px, 1.7vw, 22px)/1.4 var(--sans); }
 
-.finding, .method, .caveats { border-top: 1px solid var(--ink); padding-top: 28px; padding-bottom: 80px; row-gap: 40px; }
+.finding, .languages, .method, .caveats { border-top: 1px solid var(--ink); padding-top: 28px; padding-bottom: 80px; row-gap: 40px; }
 .finding-text { grid-column: 1 / span 5; }
 .finding-chart { grid-column: 7 / span 6; margin: 8px 0 0; }
 
@@ -103,6 +103,19 @@ code { font: 400 0.88em/1.4 var(--mono); overflow-wrap: anywhere; }
 .prose p { margin: 0 0 1em; max-width: 38em; }
 .prose p:last-child { margin-bottom: 0; }
 .method-chart { grid-column: 4 / span 7; margin: 0; }
+.lang-text { grid-column: 1 / span 5; }
+.lang-text .section-title { margin-bottom: 20px; }
+.lang-text p { margin: 0 0 1em; max-width: 34em; }
+.lang-text .statement { font: 500 clamp(20px, 2vw, 24px)/1.3 var(--display); letter-spacing: -0.01em; }
+.lang-text .note { font-size: 14px; color: var(--muted); }
+.lang-chart { grid-column: 7 / span 6; margin: 8px 0 0; }
+.run-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+.run .run-head h3 { margin: 0; }
+.disagree { font-size: 13px; color: var(--ink); }
+.disagree::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 1px;
+  border: 1.5px solid var(--ink); box-sizing: border-box;
+}
 .figure-title { margin: 0 0 16px; font: 600 17px/1.3 var(--display); }
 
 figcaption { margin-top: 12px; max-width: 40em; font-size: 14px; line-height: 1.5; color: var(--muted); }
@@ -128,6 +141,9 @@ figcaption { margin-top: 12px; max-width: 40em; font-size: 14px; line-height: 1.
 .chart .ci { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
 .chart .bar-won { fill: var(--mark); }
 .chart .bar-lost { fill: var(--accent); }
+.chart .bar-run { fill: var(--mark); }
+.chart .truth { stroke: var(--ink); stroke-width: 2; shape-rendering: crispEdges; }
+.chart .truth-label { fill: var(--ink); font-weight: 500; }
 .chart .seg-match { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
 .chart .seg-oppose { fill: var(--mark); stroke: var(--paper); stroke-width: 2; }
 
@@ -245,8 +261,8 @@ table.answers .reason { width: 30%; color: var(--ink-2); }
   :root { --side: 16px; --gutter: 16px; }
   .top ul { gap: 16px; }
   .hero { padding-top: 40px; padding-bottom: 32px; }
-  .finding, .method, .caveats { padding-bottom: 56px; }
-  .finding-text, .finding-chart, .section-title, .prose, .method-chart, .caveat-list, .foot-col,
+  .finding, .languages, .method, .caveats { padding-bottom: 56px; }
+  .finding-text, .finding-chart, .section-title, .prose, .method-chart, .caveat-list, .foot-col, .lang-text, .lang-chart,
   .explorer-intro .lede { grid-column: 1 / -1; }
   .caveat-list li { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
   .explorer-intro { padding-top: 36px; }

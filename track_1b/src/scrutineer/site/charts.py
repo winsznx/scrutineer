@@ -145,3 +145,51 @@ def directional_chart(results: dict[str, Any], run: str) -> str:
     )
     table = _table("Wrong F1 answers by language", ("Language", "Match the recommendation", "Oppose it"), rows)
     return chart + table
+
+
+BIAS_LANGS = ("de", "it", "fr", "en")
+
+
+def language_chart(results: dict[str, Any], runs: list[str], truth_run: str) -> str:
+    """Share of F1 answers saying "accepted", per language and run, with a tick at the true share."""
+    body: list[str] = []
+    rows: list[tuple[str, ...]] = []
+    y = 0
+    for lang in BIAS_LANGS:
+        truth = number(dig(results, "results", truth_run, "language_bias", "by_lang", lang, "gold_accepted"))
+        body.append(f'<text class="group" x="0" y="{y + 14}">{esc(LANG_NAMES[lang])}</text>')
+        if truth is not None:
+            body.append(f'<text class="truth-label" x="{_x(truth)}" dx="6" y="{y + 14}">true {pct(truth, 0)}</text>')
+            rows.append((LANG_NAMES[lang], "True share", pct(truth), ""))
+        y += 22
+        for run in runs:
+            entry = dig(results, "results", run, "language_bias", "by_lang", lang) or {}
+            share, n = number(entry.get("says_accepted")), entry.get("n")
+            label = f"{run_label(results, run)}, n={count(n)}" if share is not None else run_label(results, run)
+            body.append(f'<text class="label" x="0" y="{y + 12}">{esc(label)}</text>')
+            bar_top = y + LABEL
+            if share is None:
+                body.append(f'<text class="value" x="0" y="{bar_top + 10}">{NA}</text>')
+            else:
+                tip = f"{LANG_NAMES[lang]}, {run_label(results, run)}: says accepted {pct(share)} of the time"
+                body += [
+                    f'<rect class="bar-run" x="0" y="{bar_top}" width="{_x(share)}" height="{BAR}">'
+                    f"<title>{esc(tip)}</title></rect>",
+                    f'<text class="value" x="{_x(share)}" dx="6" y="{bar_top + 10}">{pct(share, 0)}</text>',
+                ]
+            if truth is not None:
+                body.append(f'<line class="truth" x1="{_x(truth)}" x2="{_x(truth)}" y1="{bar_top - 3}" '
+                            f'y2="{bar_top + BAR + 3}"/>')
+            rows.append((LANG_NAMES[lang], run_label(results, run), pct(share), count(n)))
+            y += LABEL + BAR + GAP
+        y += 6
+    chart = _svg(
+        "lang-chart",
+        "How often each language's answer says the vote was accepted",
+        "Share of F1 answers that say accepted, per language and run. The dark tick marks the share of votes "
+        "that were actually accepted.",
+        max(y, 1) + 22,
+        _gridlines(0, max(y, 1)) + body,
+    )
+    table = _table("Share of F1 answers saying accepted", ("Language", "Run", "Says accepted", "Answers"), rows)
+    return chart + table

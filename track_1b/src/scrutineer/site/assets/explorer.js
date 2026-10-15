@@ -248,10 +248,22 @@
     return el('tr', {}, cells);
   }
 
+  function languagesDisagree(answers) {
+    var outcomes = new Set();
+    Object.keys(answers.F1 || {}).forEach(function (lang) {
+      var parsed = answers.F1[lang][1];
+      if (parsed === 'accepted' || parsed === 'rejected') outcomes.add(parsed);
+    });
+    return outcomes.size > 1;
+  }
+
   function runSection(vote, run, answers) {
-    var heading = el('h3', { text: run.label });
+    var heading = el('div', { className: 'run-head' }, [el('h3', { text: run.label })]);
     if (!answers || !Object.keys(answers).length) {
       return el('section', { className: 'run' }, [heading, el('p', { className: 'muted', text: 'not yet run' })]);
+    }
+    if (languagesDisagree(answers)) {
+      heading.append(el('span', { className: 'disagree', text: 'languages disagree' }));
     }
     var head = el('thead', {}, [el('tr', {}, ['Language', 'Answer', 'Parser', 'Verdict', 'Judge reason'].map(
       function (name) { return el('th', { scope: 'col', text: name }); }))]);

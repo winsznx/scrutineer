@@ -17,6 +17,7 @@ REAL_DATA = ROOT / "data"
 VOTE_KEYS = {"a", "d", "t", "g", "i", "e", "m", "s", "pc", "o", "f", "y", "cy", "cn", "ic", "u", "k", "v"}
 BANNED = ("\u2014", "!", "robust", "seamless", "groundbreaking", "delve", "crucial", "pivotal")
 HEADLINE_SPAN = re.compile(r'<span data-headline="(?P<key>[a-z_]+)">(?P<text>[^<]*)</span>')
+RESULT_SPAN = re.compile(r'<span data-result="(?P<path>[A-Za-z0-9_.]+)">(?P<text>[^<]*)</span>')
 
 
 VOID_TAGS = frozenset({"meta", "link", "br", "img", "input", "hr", "source", "wbr"})
@@ -81,6 +82,38 @@ def test_headline_numbers_match_results(real_site: Path) -> None:
             assert shown == pytest.approx(expected, abs=0.5 * 10 ** -decimals), key
 
 
+def _shown_matches(text: str, expected: float | None) -> bool:
+    if expected is None:
+        return text == "n/a"
+    shown = float(text.rstrip("%").replace(",", ""))
+    if text.endswith("%"):
+        return bool(shown == pytest.approx(expected * 100, abs=0.05))
+    decimals = len(text.partition(".")[2])
+    return bool(shown == pytest.approx(expected, abs=0.5 * 10 ** -decimals))
+
+
+def test_language_section_numbers_match_results(real_site: Path) -> None:
+    results = json.loads((REAL_DATA / "results.json").read_text())
+    html = (real_site / "index.html").read_text()
+    assert "The answer depends on the language you ask in" in html
+    section = html.partition('id="languages"')[2].partition("</section>")[0]
+    spans = list(RESULT_SPAN.finditer(section))
+    runs_with_bias = [run for run, body in results["results"].items() if body.get("language_bias")]
+    if not runs_with_bias:
+        pytest.skip("no language_bias in results.json yet")
+    assert any(m["path"].endswith(".says_accepted") for m in spans)
+    assert any(m["path"].endswith(".gold_accepted") for m in spans)
+    assert sum(m["path"].endswith(".all_four_agree") for m in spans) == len(runs_with_bias)
+    for match in spans:
+        value: Any = results
+        for key in match["path"].split("."):
+            value = value[key]
+        assert _shown_matches(match["text"], value), (match["path"], match["text"], value)
+    claim_run = "R1" if "R1" in runs_with_bias else runs_with_bias[0]
+    assert f"results.{claim_run}.language_bias.by_lang.de.gold_accepted" in section
+    assert 'class="truth"' in section and "bar-lost" not in section
+
+
 def test_one_vote_entry_per_vote(real_site: Path) -> None:
     items = [json.loads(line) for line in (REAL_DATA / "items.jsonl").read_text().splitlines() if line]
     expected = {i["anr"] for i in items if i["family"] in {"F1", "F7"}}
@@ -125,7 +158,10 @@ def test_partial_data_renders_without_crashing(tmp_path: Path) -> None:
         _item("665", "F1", {"outcome": "accepted"}, 1, "Volksinitiative für eine 13. AHV-Rente"),
         _item("690", "F7", {"outcome": "not_decided"}, None, "Bundesbeschluss über die Finanzierung der 13. AHV-Rente"),
     ])
-    (data / "results.json").write_text(json.dumps({"results": {"R1": {"headline": {"gap_points": None}}}}))
+    by_lang = {"de": {"n": 1, "says_accepted": 1.0, "gold_accepted": 1.0}, "fr": {"n": 1, "says_accepted": None}}
+    bias = {"by_lang": by_lang, "all_four_agree": None, "votes_all_four_answered": 0}
+    results = {"results": {"R1": {"headline": {"gap_points": None}, "language_bias": bias}}, "robustness": None}
+    (data / "results.json").write_text(json.dumps(results))
     (data / "responses").mkdir()
     (data / "responses" / "R1.meta.json").write_text("{}")
     (data / "responses" / "smoke1.meta.json").write_text("{}")
@@ -138,6 +174,7 @@ def test_partial_data_renders_without_crashing(tmp_path: Path) -> None:
     index = (site / "index.html").read_text()
     assert '<span data-headline="gap_points">n/a</span>' in index
     assert "accepted on 3 March 2024" in index
+    assert "Not yet run." not in index and "is still running" in index
     _assert_well_formed(index)
     _assert_well_formed((site / "explorer.html").read_text())
     payload = json.loads((site / "data" / "votes.json").read_text())

@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlparse
 
-from scrutineer.site.charts import directional_chart, gov_lost_chart
+from scrutineer.site.charts import BIAS_LANGS, directional_chart, gov_lost_chart, language_chart
 from scrutineer.site.common import (
     CORE_LANGS,
     INSTRUMENTS,
@@ -34,6 +34,7 @@ DATASET_URL = "https://huggingface.co/datasets/winsznx/scrutineer"
 REPORT_URL = f"{REPO_URL}/blob/main/track_1b/Scrutineer_Report.pdf"
 CONTAMINATION_URL = f"{REPO_URL}/blob/main/track_1b/docs/CONTAMINATION.md"
 LEDGER_URL = f"{REPO_URL}/blob/main/track_1b/docs/CLAIM_LEDGER.md"
+TEMPLATES_URL = f"{REPO_URL}/tree/main/track_1b/src/scrutineer/templates"
 SWISSVOTES_URL = "https://swissvotes.ch"
 FONTS_URL = ("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500"
              "&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Inter+Tight:wght@500;600;700&display=swap")
@@ -198,6 +199,102 @@ Federal Council lost.</figcaption>
 """
 
 
+def _result(path: str, text: str) -> str:
+    """A number on the page, tagged with the results.json path it was read from."""
+    return f'<span data-result="{esc(path)}">{esc(text)}</span>'
+
+
+def _bias_runs(data: SiteData) -> list[str]:
+    return [run for run in data.runs if dig(data.results, "results", run, "language_bias", "by_lang")]
+
+
+def _truth_run(data: SiteData, runs: list[str]) -> str | None:
+    """The run with the most answered F1 items gives the most complete true share."""
+    answered = {run: number(dig(data.results, "runs", run, "coverage", "F1", "answered")) or 0 for run in runs}
+    return max(runs, key=lambda run: answered[run]) if runs else None
+
+
+def _language_statement(data: SiteData, runs: list[str]) -> str:
+    run = CLAIM_RUN if CLAIM_RUN in runs else runs[0]
+    base = f"results.{run}.language_bias.by_lang"
+    shares = {lang: number(dig(data.results, "results", run, "language_bias", "by_lang", lang, "says_accepted"))
+              for lang in BIAS_LANGS}
+    known = {lang: share for lang, share in shares.items() if share is not None}
+    if len(known) < 2:
+        return f"{esc(run_label(data.results, run))}: not yet run."
+    low, high = min(known, key=lambda k: known[k]), max(known, key=lambda k: known[k])
+    # Compare like with like: the true share over the same votes this run has answered.
+    truth_path = f"{base}.de"
+    truth = dig(data.results, "results", run, "language_bias", "by_lang", "de") or {}
+    return (f"Asked in {LANG_NAMES[low]}, {esc(run_label(data.results, run))} says a proposal was accepted "
+            f"{_result(f'{base}.{low}.says_accepted', pct(known[low]))} of the time. In {LANG_NAMES[high]} it says "
+            f"so {_result(f'{base}.{high}.says_accepted', pct(known[high]))} of the time. On the "
+            f"{_result(f'{truth_path}.n', count(truth.get('n')))} votes it has answered, the true share is "
+            f"{_result(f'{truth_path}.gold_accepted', pct(truth.get('gold_accepted')))}.")
+
+
+def _agreement(data: SiteData, runs: list[str]) -> str:
+    parts = []
+    for run in runs:
+        path = f"results.{run}.language_bias"
+        bias = dig(data.results, "results", run, "language_bias") or {}
+        parts.append(f"{_result(f'{path}.all_four_agree', count(bias.get('all_four_agree')))} of "
+                     f"{_result(f'{path}.votes_all_four_answered', count(bias.get('votes_all_four_answered')))} "
+                     f"votes for {esc(run_label(data.results, run))}")
+    return "German, French, Italian and English give the same answer on " + ", ".join(parts) + "."
+
+
+def _shift(lang: str, entry: dict[str, Any]) -> str:
+    path = f"robustness.order_swap.by_lang.{lang}"
+    return (f"{_result(f'{path}.shift_points', fixed(entry.get('shift_points')))} points in {LANG_NAMES[lang]} "
+            f"(n={_result(f'{path}.n', count(entry.get('n')))})")
+
+
+def _order_swap(data: SiteData) -> str:
+    swap = dig(data.results, "robustness", "order_swap")
+    by_lang = dig(swap, "by_lang") or {}
+    langs = [lang for lang in ("fr", "en", "de") if number(dig(by_lang, lang, "shift_points")) is not None]
+    if not langs:
+        return ("A test that asks with the options reversed, \"rejected or accepted\", is still running. It checks "
+                "whether the order of the options causes the effect.")
+    shifts = ", ".join(_shift(lang, by_lang[lang]) for lang in langs)
+    compared = dig(swap, "compared_with")
+    model = esc(run_label(data.results, str(compared))) if compared else NA
+    sizes = [number(by_lang[lang].get("n")) or 0 for lang in langs]
+    universe = number(dig(data.results, "items", "universe_votes")) or 0
+    partial = " so far" if min(sizes) < 0.95 * universe else ""
+    return (f"Asking \"rejected or accepted\" instead of \"accepted or rejected\" moved the share of accepted "
+            f"answers{partial} by {shifts}, with {model}. Registered reading: under 10 points, the option order "
+            "does not explain the effect. 20 points or more, it explains a large part.")
+
+
+def _languages(data: SiteData) -> str:
+    runs = _bias_runs(data)
+    truth_run = _truth_run(data, runs)
+    if truth_run is None:
+        body = "<p>Not yet run.</p>"
+        chart = ""
+    else:
+        body = (f'<p class="statement">{_language_statement(data, runs)}</p>'
+                f"<p>{_agreement(data, runs)}</p>"
+                f"<p>{_order_swap(data)}</p>"
+                f'<p class="note">This was noticed after the data came in, so it is exploratory. It is registered as '
+                f"E1 in the {_link(LEDGER_URL, 'claim ledger')}.</p>")
+        chart = f"""<figure class="lang-chart">
+{language_chart(data.results, runs, truth_run)}
+<figcaption>Share of F1 answers that say the proposal was accepted. The dark tick is the share that was actually
+accepted, from the {esc(run_label(data.results, truth_run))} run, which has answered the most votes.</figcaption>
+</figure>"""
+    return f"""<section class="languages wrap grid" id="languages" aria-labelledby="languages-h">
+<div class="lang-text">
+<h2 class="section-title" id="languages-h">The answer depends on the language you ask in</h2>
+{body}
+</div>
+{chart}
+</section>
+"""
+
+
 def _method(data: SiteData) -> str:
     results = data.results
     items = count(dig(results, "items", "count"))
@@ -308,12 +405,20 @@ def _contamination(results: dict[str, Any]) -> str:
     return f'{esc(text)}{done} in {_link(CONTAMINATION_URL, "CONTAMINATION.md")}.'
 
 
+def _language_templates() -> str:
+    text = ("Every language has its own question template, so the language effect could come from how each "
+            "template is worded rather than from the language itself. The option-order test above checks one part "
+            "of that. The templates are in ")
+    return f'{esc(text)}{_link(TEMPLATES_URL, "src/scrutineer/templates/")}.'
+
+
 def _caveats(data: SiteData) -> str:
     results = data.results
     entries = (
         ("Government lost or usual outcome", _confound(results)),
         ("Contamination", _contamination(results)),
         ("Template phrasing", _templates(results)),
+        ("Language or template wording", _language_templates()),
         ("Hosted endpoint, not official weights", _hosted(results)),
         ("Judge disagreement", _judge(results)),
     )
@@ -327,7 +432,8 @@ def _caveats(data: SiteData) -> str:
 
 def landing(data: SiteData) -> str:
     description = TAGLINE
-    return (_head("Scrutineer", description) + _nav("finding") + '<main id="main">\n' + _hero(data) + _method(data)
+    return (_head("Scrutineer", description) + _nav("finding") + '<main id="main">\n' + _hero(data) + _languages(data)
+            + _method(data)
             + _caveats(data) + "</main>\n" + _footer(data) + "</body>\n</html>\n")
 
 
