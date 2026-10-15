@@ -24,7 +24,7 @@ dependencies = [
 
 [project.optional-dependencies]
 replay = ["torch>=2.4", "transformers>=4.56", "accelerate>=0.34"]
-contamination = ["datasets>=3.0"]
+contamination = ["pyarrow>=15"]
 dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "types-PyYAML"]
 
 [project.scripts]
@@ -32,7 +32,7 @@ scrutineer = "scrutineer.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/scrutineer"]
-artifacts = ["src/scrutineer/report/fonts/*.ttf", "src/scrutineer/templates/*.yaml"]
+artifacts = ["src/scrutineer/report/fonts/*.ttf", "src/scrutineer/templates/*.yaml", "src/scrutineer/site/assets/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -54,7 +54,7 @@ mypy_path = "src"
 packages = ["scrutineer"]
 
 [[tool.mypy.overrides]]
-module = ["matplotlib.*", "transformers.*", "torch.*", "datasets.*"]
+module = ["matplotlib.*", "transformers.*", "torch.*", "pyarrow.*"]
 ignore_missing_imports = true
 
 [tool.ruff.lint.per-file-ignores]

@@ -1,4 +1,4 @@
-"""Command line entry point: scrutineer build | run | grade | report | site | verify."""
+"""Command line entry point: scrutineer build | run | grade | report | site | verify | contamination."""
 
 from __future__ import annotations
 
@@ -15,6 +15,12 @@ from typing import Any
 from scrutineer.paths import Paths, default_paths
 
 Handler = Callable[[argparse.Namespace, Paths], int]
+
+# `scrutineer run` exit codes, used by scripts/supervise_run.sh
+EXIT_REMAINING = 3
+EXIT_BUDGET = 4
+EXIT_ENDPOINT_DOWN = 5
+EXIT_SIGNAL = 130
 
 
 def cmd_fetch_titles(args: argparse.Namespace, paths: Paths) -> int:
@@ -151,7 +157,10 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     if state.stop_reason:
         print(f"stopped: {state.stop_reason}", file=sys.stderr)
     report_remaining(remaining, paths.responses / f"{args.run_id}.remaining.txt")
-    return 0 if not remaining else 3
+    if not remaining:
+        return 0
+    return {"budget": EXIT_BUDGET, "endpoint": EXIT_ENDPOINT_DOWN, "signal": EXIT_SIGNAL}.get(
+        state.stop_kind or "", EXIT_REMAINING)
 
 
 def cmd_budget(args: argparse.Namespace, paths: Paths) -> int:
@@ -272,6 +281,48 @@ def cmd_export_human_check(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+def cmd_contamination(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.contamination import run, write_report
+
+    report = run(paths, docs_per_lang=args.docs_per_lang, seed=args.seed, skip_corpus=args.skip_corpus)
+    write_report(report, paths.docs / "contamination.json", paths.docs / "CONTAMINATION.md")
+    for blocklist in report["domains"]["blocklists"]:
+        listed = [host for host, hit in blocklist["exact_matches"].items() if hit]
+        print(f"{blocklist['file']}: {blocklist['lines']} lines, exact source hosts listed: {listed or 'none'}, "
+              f"related hosts listed: {blocklist['source_hosts_listed'] or 'none'}")
+    for lang, summary in (report["corpus"] or {}).get("languages", {}).items():
+        print(f"{lang}: {summary['sample_docs']} docs, {summary['prompts_with_hit']}/{summary['prompts']} prompts "
+              f"with a 13-gram hit ({summary['prompts_with_template_hits']} touching template), "
+              f"{summary['titles_verbatim']['titles']}/{summary['distinct_titles']} titles verbatim")
+    print(f"wrote {paths.docs / 'contamination.json'} and {paths.docs / 'CONTAMINATION.md'}")
+    return 0
+
+
+def cmd_site(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.site.generate import build_site
+
+    print(f"site written to {build_site(paths)}")
+    return 0
+
+
+def cmd_replay(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.results import load_items
+    from scrutineer.replay import agreement, generate, sample_items
+    from scrutineer.run.runner import read_records
+
+    hosted = read_records(paths.responses / f"{args.hosted_run}.jsonl")
+    items = sample_items(list(load_items(paths).values()), hosted)
+    out_dir = paths.data / "replay"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    local_path = out_dir / "local_8b.jsonl"
+    if not args.compare_only:
+        generate(items, local_path, device=args.device)
+    result = agreement(items, read_records(local_path), hosted)
+    (out_dir / "agreement.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    print(f"label agreement {result['label_agreement']} on {result['n']} items")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="scrutineer", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -318,6 +369,18 @@ def build_parser() -> argparse.ArgumentParser:
     human.add_argument("--seed", type=int, default=0)
     human.add_argument("--force", action="store_true")
 
+    contamination = sub.add_parser("contamination", help="robots.txt opt-outs and 13-gram overlap with FineWeb-2")
+    contamination.add_argument("--docs-per-lang", type=int, default=100_000)
+    contamination.add_argument("--seed", type=int, default=0)
+    contamination.add_argument("--skip-corpus", action="store_true", help="domain check only")
+
+    sub.add_parser("site", help="build the static site into site/")
+
+    replay = sub.add_parser("replay", help="replay 100 F1 items on the official 8B weights, compare with R2")
+    replay.add_argument("--hosted-run", default="R2")
+    replay.add_argument("--device", help="torch device; default mps if available, else cpu")
+    replay.add_argument("--compare-only", action="store_true", help="skip generation, recompute agreement")
+
     return parser
 
 
@@ -331,6 +394,9 @@ HANDLERS: dict[str, Handler] = {
     "verify": cmd_verify,
     "export-human-check": cmd_export_human_check,
     "report": cmd_report,
+    "contamination": cmd_contamination,
+    "site": cmd_site,
+    "replay": cmd_replay,
 }
 
 
