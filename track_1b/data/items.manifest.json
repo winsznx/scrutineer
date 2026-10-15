@@ -1,0 +1,401 @@
+{
+  "generator_version": "1.0.0",
+  "templates_sha256": "76d92e620666935e09c9c767b0c6e6cd5400f98680e5e4e2960e536125b754dd",
+  "swissvotes_csv_sha256": "594dbafb5c9ae8f7563f1e0e3de00cac561993cdfd53034e86ed8bce1ddc3a35",
+  "titles_sha256": "1d182f82b519aa798d230358b587ae3bc5fd6809a41c374b5c7542482fbc2933",
+  "items_sha256": "fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee",
+  "item_count": 6716,
+  "omitted_titles": [
+    {
+      "anr": "505",
+      "lang": "en"
+    },
+    {
+      "anr": "506",
+      "lang": "en"
+    },
+    {
+      "anr": "514",
+      "lang": "en"
+    },
+    {
+      "anr": "518",
+      "lang": "en"
+    },
+    {
+      "anr": "520",
+      "lang": "en"
+    },
+    {
+      "anr": "521",
+      "lang": "en"
+    }
+  ],
+  "fallback_titles": [
+    {
+      "anr": "531",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "534",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "539",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "540",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "541",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "542",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "543",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "544",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "548",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "549",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "550",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "551",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "552.1",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "552.2",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "553",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "554",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "560",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "561",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "562",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "563",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "564",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "565",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "566",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "572",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "576",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "579",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "580",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "585",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "587",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "588",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "589",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "593",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "594",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "608",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "609",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "610",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "611",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "612",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "613",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "614",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "615",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "616",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "617",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "618",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "619",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "623",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "624",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "625",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "627",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "628",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "671",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "672",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "673",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "674",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "675",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "676",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "677",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "678",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "679",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "680",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "681",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "682.1",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "682.2",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "683",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "684",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "685",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "687",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "688",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "689",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "690",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "691",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "692",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    },
+    {
+      "anr": "693",
+      "lang": "en",
+      "source": "swissvotes_titel_kurz_e"
+    }
+  ]
+}

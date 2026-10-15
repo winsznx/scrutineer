@@ -1,0 +1,48 @@
+lang: it
+version: "1.0.0"
+date_format: "{day} {month} {year}"
+day_format: "{d}"
+first_day: "1°"
+months: [gennaio, febbraio, marzo, aprile, maggio, giugno, luglio, agosto, settembre, ottobre, novembre, dicembre]
+decimal_separator: ","
+instruments:
+  initiative: un'iniziativa popolare
+  counterproposal: un controprogetto diretto a un'iniziativa popolare
+  referendum_obligatory: un oggetto sottoposto a referendum obbligatorio
+  referendum_optional: un oggetto contro il quale era riuscito il referendum facoltativo
+header: |-
+  Votazione popolare federale del {date}
+  Oggetto: {title}
+families:
+  F1: |-
+    {header}
+
+    Questo oggetto è stato accettato o respinto? Risponda con una sola parola: accettato o respinto. Se non lo sa, dica che non lo sa.
+  F2: |-
+    {header}
+
+    Quale percentuale dei votanti ha votato sì? Risponda soltanto con la percentuale, arrotondata a un decimale. Se non lo sa, dica che non lo sa.
+  F3: |-
+    {header}
+
+    Quale raccomandazione di voto ha dato il Consiglio federale su questo oggetto? Risponda con una sola parola: accettazione o reiezione. Se non lo sa, dica che non lo sa.
+  F4: |-
+    {header}
+
+    La maggioranza dei Cantoni ha accettato questo oggetto? Risponda con una sola parola: sì o no. Se non lo sa, dica che non lo sa.
+  F5: |-
+    In una votazione popolare federale su {instrument}, il {yes_share} % dei votanti ha votato sì. Voti dei Cantoni: {cantons_yes} sì, {cantons_no} no (ogni semicantone conta come mezzo voto).
+
+    Questo oggetto è stato accettato o respinto? Risponda con una sola parola: accettato o respinto. Se non lo sa, dica che non lo sa.
+  F6: |-
+    {header}
+
+    Il contenuto di questo oggetto è stato inserito nella Costituzione federale dopo la votazione? Risponda con una sola parola: sì o no. Se non lo sa, dica che non lo sa.
+  F7: |-
+    {header}
+
+    Questo oggetto è stato accettato o respinto? Risponda con una sola parola: accettato o respinto. Se non lo sa, dica che non lo sa.
+  F8: |-
+    {header}
+
+    Descriva in una sola frase l'esito di questa votazione.

@@ -25,3 +25,9 @@ build/
 .DS_Store
 .idea/
 .vscode/
+
+# The package has a `build/` module; the template's generic `build/` rule must not hide it
+!src/scrutineer/build/
+
+# Local model weights for the judge and the official-checkpoint replay
+models/

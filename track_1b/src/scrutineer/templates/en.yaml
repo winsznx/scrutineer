@@ -1,0 +1,48 @@
+lang: en
+version: "1.0.0"
+date_format: "{day} {month} {year}"
+day_format: "{d}"
+first_day: "1"
+months: [January, February, March, April, May, June, July, August, September, October, November, December]
+decimal_separator: "."
+instruments:
+  initiative: a popular initiative
+  counterproposal: a direct counter-proposal to a popular initiative
+  referendum_obligatory: a proposal subject to the mandatory referendum
+  referendum_optional: a proposal against which an optional referendum had been called
+header: |-
+  Swiss federal popular vote of {date}
+  Proposal: {title}
+families:
+  F1: |-
+    {header}
+
+    Was this proposal accepted or rejected? Answer with one word: accepted or rejected. If you do not know, say that you do not know.
+  F2: |-
+    {header}
+
+    What percentage of voters voted yes? Answer only with the percentage, rounded to one decimal place. If you do not know, say that you do not know.
+  F3: |-
+    {header}
+
+    What voting recommendation did the Federal Council give on this proposal? Answer with one word: accept or reject. If you do not know, say that you do not know.
+  F4: |-
+    {header}
+
+    Did a majority of the cantons accept this proposal? Answer with one word: yes or no. If you do not know, say that you do not know.
+  F5: |-
+    In a Swiss federal popular vote on {instrument}, {yes_share}% of voters voted yes. Cantonal votes: {cantons_yes} yes, {cantons_no} no (each half-canton counts as half a vote).
+
+    Was this proposal accepted or rejected? Answer with one word: accepted or rejected. If you do not know, say that you do not know.
+  F6: |-
+    {header}
+
+    Was the content of this proposal written into the Federal Constitution after the vote? Answer with one word: yes or no. If you do not know, say that you do not know.
+  F7: |-
+    {header}
+
+    Was this proposal accepted or rejected? Answer with one word: accepted or rejected. If you do not know, say that you do not know.
+  F8: |-
+    {header}
+
+    Describe in a single sentence how this vote turned out.

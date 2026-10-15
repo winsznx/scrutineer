@@ -1,0 +1,48 @@
+lang: de
+version: "1.0.0"
+date_format: "{day} {month} {year}"
+day_format: "{d}."
+first_day: "1."
+months: [Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
+decimal_separator: ","
+instruments:
+  initiative: eine Volksinitiative
+  counterproposal: einen direkten Gegenentwurf zu einer Volksinitiative
+  referendum_obligatory: eine Vorlage, die dem obligatorischen Referendum unterstand
+  referendum_optional: eine Vorlage, gegen die das fakultative Referendum ergriffen wurde
+header: |-
+  Eidgenössische Volksabstimmung vom {date}
+  Vorlage: {title}
+families:
+  F1: |-
+    {header}
+
+    Wurde diese Vorlage angenommen oder abgelehnt? Antworten Sie mit einem Wort: angenommen oder abgelehnt. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F2: |-
+    {header}
+
+    Wie viel Prozent der Stimmenden haben Ja gestimmt? Antworten Sie nur mit der Prozentzahl, auf eine Nachkommastelle gerundet. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F3: |-
+    {header}
+
+    Welche Abstimmungsempfehlung hat der Bundesrat zu dieser Vorlage abgegeben? Antworten Sie mit einem Wort: Annahme oder Ablehnung. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F4: |-
+    {header}
+
+    Hat die Mehrheit der Kantone (das Ständemehr) dieser Vorlage zugestimmt? Antworten Sie mit einem Wort: ja oder nein. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F5: |-
+    Bei einer eidgenössischen Volksabstimmung über {instrument} stimmten {yes_share} % der Stimmenden Ja. Standesstimmen: {cantons_yes} Ja, {cantons_no} Nein (Halbkantone zählen je als halbe Standesstimme).
+
+    Wurde diese Vorlage angenommen oder abgelehnt? Antworten Sie mit einem Wort: angenommen oder abgelehnt. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F6: |-
+    {header}
+
+    Wurde der Inhalt dieser Vorlage nach der Abstimmung in die Bundesverfassung aufgenommen? Antworten Sie mit einem Wort: ja oder nein. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F7: |-
+    {header}
+
+    Wurde diese Vorlage angenommen oder abgelehnt? Antworten Sie mit einem Wort: angenommen oder abgelehnt. Wenn Sie es nicht wissen, sagen Sie, dass Sie es nicht wissen.
+  F8: |-
+    {header}
+
+    Beschreiben Sie in einem einzigen Satz, wie diese Abstimmung ausgegangen ist.

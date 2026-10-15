@@ -1,0 +1,24 @@
+lang: rm
+version: "1.0.0"
+date_format: "{day} da {month} {year}"
+day_format: "{d}"
+first_day: "1"
+months: [schaner, favrer, mars, avrigl, matg, zercladur, fanadur, avust, settember, october, november, december]
+decimal_separator: ","
+instruments:
+  initiative: in'iniziativa dal pievel
+  counterproposal: in cuntraproposta directa ad in'iniziativa dal pievel
+  referendum_obligatory: in project suttamess al referendum obligatoric
+  referendum_optional: in project cunter il qual il referendum facultativ è vegnì prendì
+header: |-
+  Votaziun federala dal pievel dals {date}
+  Project: {title}
+families:
+  F1: |-
+    {header}
+
+    È quest project vegnì acceptà u refusà? Respundai cun in sulet pled: acceptà u refusà. Sche Vus na savais betg, schai che Vus na savais betg.
+  F7: |-
+    {header}
+
+    È quest project vegnì acceptà u refusà? Respundai cun in sulet pled: acceptà u refusà. Sche Vus na savais betg, schai che Vus na savais betg.

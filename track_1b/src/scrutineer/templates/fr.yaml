@@ -1,0 +1,48 @@
+lang: fr
+version: "1.0.0"
+date_format: "{day} {month} {year}"
+day_format: "{d}"
+first_day: "1er"
+months: [janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
+decimal_separator: ","
+instruments:
+  initiative: une initiative populaire
+  counterproposal: un contre-projet direct à une initiative populaire
+  referendum_obligatory: un objet soumis au référendum obligatoire
+  referendum_optional: un objet contre lequel le référendum facultatif avait abouti
+header: |-
+  Votation populaire fédérale du {date}
+  Objet : {title}
+families:
+  F1: |-
+    {header}
+
+    Cet objet a-t-il été accepté ou rejeté ? Répondez par un seul mot : accepté ou rejeté. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F2: |-
+    {header}
+
+    Quel pourcentage des votants a voté oui ? Répondez uniquement par le pourcentage, arrondi à une décimale. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F3: |-
+    {header}
+
+    Quelle recommandation de vote le Conseil fédéral a-t-il émise sur cet objet ? Répondez par un seul mot : acceptation ou rejet. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F4: |-
+    {header}
+
+    La majorité des cantons a-t-elle accepté cet objet ? Répondez par un seul mot : oui ou non. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F5: |-
+    Lors d'une votation populaire fédérale sur {instrument}, {yes_share} % des votants ont voté oui. Voix des cantons : {cantons_yes} oui, {cantons_no} non (chaque demi-canton compte pour une demi-voix).
+
+    Cet objet a-t-il été accepté ou rejeté ? Répondez par un seul mot : accepté ou rejeté. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F6: |-
+    {header}
+
+    Le contenu de cet objet a-t-il été inscrit dans la Constitution fédérale après la votation ? Répondez par un seul mot : oui ou non. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F7: |-
+    {header}
+
+    Cet objet a-t-il été accepté ou rejeté ? Répondez par un seul mot : accepté ou rejeté. Si vous ne le savez pas, dites que vous ne le savez pas.
+  F8: |-
+    {header}
+
+    Décrivez en une seule phrase l'issue de cette votation.
