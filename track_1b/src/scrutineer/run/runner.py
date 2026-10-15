@@ -96,11 +96,16 @@ class StopRun(Exception):
     """The server refused for lack of balance; nothing more may be sent."""
 
 
+class EndpointDown(StopRun):
+    """Too many consecutive failures; the endpoint is treated as unavailable."""
+
+
 @dataclass
 class RunState:
     done: set[str] = field(default_factory=set)
     failed: set[str] = field(default_factory=set)
     stop_reason: str | None = None
+    stop_kind: str | None = None  # "budget", "endpoint" or "signal"
     consecutive_failures: int = 0
 
 
@@ -298,7 +303,7 @@ class Runner:
             self.state.failed.add(item["item_id"])
             self.state.consecutive_failures += 1
             if self.state.consecutive_failures >= CIRCUIT_BREAKER:
-                raise StopRun(f"{CIRCUIT_BREAKER} consecutive failures, last: HTTP {last_status}")
+                raise EndpointDown(f"{CIRCUIT_BREAKER} consecutive failures, last: HTTP {last_status}")
         finally:
             await self.guard.settle(worst, self.config.run_id, item["item_id"], request_id, actual)
 
@@ -323,6 +328,7 @@ class Runner:
         def request_stop(signum: int) -> None:
             if self.state.stop_reason is None:
                 self.state.stop_reason = f"signal {signal.Signals(signum).name}; in-flight requests finished"
+                self.state.stop_kind = "signal"
             stop.set()
 
         loop = asyncio.get_running_loop()
@@ -340,6 +346,7 @@ class Runner:
                 except (BudgetExhausted, StopRun) as exc:
                     if self.state.stop_reason is None:
                         self.state.stop_reason = str(exc)
+                        self.state.stop_kind = "endpoint" if isinstance(exc, EndpointDown) else "budget"
                     stop.set()
 
         async with httpx.AsyncClient(

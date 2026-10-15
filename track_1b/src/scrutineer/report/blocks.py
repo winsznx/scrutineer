@@ -22,8 +22,10 @@ FAMILY_NAMES = {
     "F1": "Outcome", "F2": "Yes share", "F3": "FC recommendation", "F4": "Cantons majority",
     "F5": "Reasoning control", "F6": "In the constitution", "F7": "Post-cutoff", "F8": "Free recall",
 }
-MARKER = re.compile(r"(<!-- scrutineer:begin (?P<name>[a-z0-9_]+) -->\n)(?P<body>.*?)(<!-- scrutineer:end (?P=name) -->)",
-                    re.DOTALL)
+MARKER = re.compile(
+    r"(<!-- scrutineer:begin (?P<name>[a-z0-9_]+) -->\n)(?P<body>.*?)(<!-- scrutineer:end (?P=name) -->)",
+    re.DOTALL,
+)
 
 Results = dict[str, Any]
 
@@ -36,7 +38,9 @@ def num(value: float | None, digits: int = 1) -> str:
     return "n/a" if value is None else f"{value:.{digits}f}"
 
 
-def _cell(results: Results, run: str, family: str, lang: str, stratum: str = "all", value: str = "all") -> dict[str, Any]:
+def _cell(
+    results: Results, run: str, family: str, lang: str, stratum: str = "all", value: str = "all"
+) -> dict[str, Any]:
     for row in results["results"].get(run, {}).get("cells", []):
         if (row["family"], row["lang"], row["stratum"], row["value"]) == (family, lang, stratum, value):
             return dict(row)
@@ -75,7 +79,8 @@ def claims(results: Results) -> str:
         f"| C1 literal clause | FC-matching share of incorrect answers on gov-lost votes | "
         f"{pct(h.get('literal_clause_share'))} (n = {h.get('literal_clause_n', 0)}), 100% by construction | n/a |",
         f"| C3 reasoning | F5 on gov-lost votes ≥ 80% and ≥ 15 pts above F1 (de) | "
-        f"F5 {pct(rvr.get('f5_accuracy'))}, F1 {pct(rvr.get('f1_de_accuracy'))} | {results['claims'].get('C3', 'PENDING')} |",
+        f"F5 {pct(rvr.get('f5_accuracy'))}, F1 {pct(rvr.get('f1_de_accuracy'))} | "
+        f"{results['claims'].get('C3', 'PENDING')} |",
     ]
     return "\n".join(rows) + "\n"
 
@@ -133,8 +138,9 @@ def secondary_table(results: Results) -> str:
         f2 = results["results"][run]["yes_share"].get("core", {})
         f7 = results["results"][run]["post_cutoff"].get("core", {})
         rvr = results["results"][run]["reasoning_vs_recall"].get("gov_lost", {})
-        rows.append(f"| {results['runs'][run]['label']} | {num(f2.get('mae_points'))} | {pct(f2.get('within_1_point'))} | "
-                    f"{pct(f7.get('accuracy'))} (n={f7.get('n', 0)}) | {num(rvr.get('gap_points'))} pts |")
+        rows.append(f"| {results['runs'][run]['label']} | {num(f2.get('mae_points'))} | "
+                    f"{pct(f2.get('within_1_point'))} | {pct(f7.get('accuracy'))} (n={f7.get('n', 0)}) | "
+                    f"{num(rvr.get('gap_points'))} pts |")
     return "\n".join(rows) + "\n"
 
 
@@ -146,7 +152,8 @@ def runs_table(results: Results) -> str:
         s = info["summary"]
         rows.append(f"| {run} | `{info['model']}` | {s['items_ok']:,} / {s['items_selected']:,} | "
                     f"{s['items_failed_final']} | {s['failed_records_total']} | {s['cost_usd']:.4f} | "
-                    f"{s['prompt_tokens']:,} / {s['completion_tokens']:,} | {s['latency_ms_p50']} / {s['latency_ms_p95']} |")
+                    f"{s['prompt_tokens']:,} / {s['completion_tokens']:,} | "
+                    f"{s['latency_ms_p50']} / {s['latency_ms_p95']} |")
     return "\n".join(rows) + "\n"
 
 
@@ -167,7 +174,8 @@ def human_table(results: Results) -> str:
     rows = [f"Labelled {human['labelled']} of {human['sample_size']} sampled judgements ({human['status']}).", "",
             "| Language | n | Raw agreement | Cohen's κ |", "|---|--:|--:|--:|"]
     for lang, s in human["by_lang"].items():
-        rows.append(f"| {LANG_NAMES.get(lang, lang)} | {s['n']} | {pct(s['raw_agreement'])} | {num(s['cohen_kappa'], 3)} |")
+        rows.append(f"| {LANG_NAMES.get(lang, lang)} | {s['n']} | {pct(s['raw_agreement'])} | "
+                    f"{num(s['cohen_kappa'], 3)} |")
     return "\n".join(rows) + "\n"
 
 

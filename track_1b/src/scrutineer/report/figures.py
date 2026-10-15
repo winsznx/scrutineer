@@ -12,10 +12,9 @@ from typing import Any
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib import font_manager  # noqa: E402
-from matplotlib.axes import Axes  # noqa: E402
-from matplotlib.figure import Figure  # noqa: E402
+import matplotlib.pyplot as plt
+from matplotlib import font_manager
+from matplotlib.figure import Figure
 
 RED = "#D52B1E"
 GREY = "#8A8A8A"
