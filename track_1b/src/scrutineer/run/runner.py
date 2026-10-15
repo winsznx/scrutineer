@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import random
+import signal
 import sys
 import time
 from collections.abc import Iterable
@@ -315,6 +316,15 @@ class Runner:
         if self.config.provider.api_key:
             headers["Authorization"] = f"Bearer {self.config.provider.api_key}"
         stop = asyncio.Event()
+
+        def request_stop(signum: int) -> None:
+            if self.state.stop_reason is None:
+                self.state.stop_reason = f"signal {signal.Signals(signum).name}; in-flight requests finished"
+            stop.set()
+
+        loop = asyncio.get_running_loop()
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(signum, request_stop, signum)
 
         async def worker(client: httpx.AsyncClient) -> None:
             while not stop.is_set():
