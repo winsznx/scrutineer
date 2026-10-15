@@ -89,8 +89,8 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     from scrutineer.run.budget import BudgetGuard, SpendLedger, reconcile
     from scrutineer.run.providers import USER_AGENT, price_for, resolve_provider
     from scrutineer.run.runner import (
-        Runner,
         RunConfig,
+        Runner,
         order_items,
         pending_items,
         read_records,
@@ -168,6 +168,79 @@ def cmd_budget(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+def cmd_judge(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.grade import answer_text, needs_judge
+    from scrutineer.grade.judge import JudgeTask, judge_all
+    from scrutineer.grade.results import load_items, run_ids
+    from scrutineer.run.runner import read_records
+
+    meta = json.loads((paths.docs / "judge_meta.json").read_text())
+    items = load_items(paths)
+    paths.judgements.mkdir(parents=True, exist_ok=True)
+    for run_id in args.run_id or run_ids(paths):
+        records = read_records(paths.responses / f"{run_id}.jsonl")
+        tasks = []
+        for item_id, record in records.items():
+            if record["status"] != "ok":
+                continue
+            item = items[item_id]
+            response = answer_text(record)
+            reason = needs_judge(item, response)
+            if reason:
+                tasks.append(JudgeTask(run_id, item, response, reason))
+        sent = asyncio.run(judge_all(
+            tasks, paths.judgements / f"{run_id}.jsonl", args.base_url,
+            meta["gguf_sha256"], concurrency=args.concurrency,
+        ))
+        print(f"{run_id}: {len(tasks)} items need the judge, {sent} judged now")
+    return 0
+
+
+def _write_results(paths: Paths) -> bytes:
+    from scrutineer.grade.results import assemble, graded_run, load_items, run_ids, serialise, write_graded
+
+    items = load_items(paths)
+    for run_id in run_ids(paths):
+        write_graded(paths.data / "graded" / f"{run_id}.jsonl", graded_run(paths, run_id, items))
+    payload = serialise(assemble(paths))
+    paths.results.write_bytes(payload)
+    return payload
+
+
+def cmd_grade(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.results import digest
+
+    payload = _write_results(paths)
+    sha = digest(payload)
+    if args.update_hash:
+        paths.results_hash.write_text(f"{sha}  results.json\n")
+    print(f"results.json sha256 {sha}")
+    return 0
+
+
+def cmd_verify(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.results import digest
+
+    expected = paths.results_hash.read_text().split()[0]
+    actual = digest(_write_results(paths))
+    if actual != expected:
+        print(f"VERIFY FAILED: results.json sha256 {actual}, expected {expected}", file=sys.stderr)
+        return 1
+    print(f"verified: results.json sha256 {actual} matches results.sha256")
+    return 0
+
+
+def cmd_export_human_check(args: argparse.Namespace, paths: Paths) -> int:
+    from scrutineer.grade.human import export_sample
+
+    if paths.human_check.exists() and not args.force:
+        print(f"{paths.human_check} exists; refusing to overwrite labels (use --force)", file=sys.stderr)
+        return 1
+    count, population = export_sample(paths, fraction=args.fraction, seed=args.seed)
+    print(f"exported {count} of {population} judged items to {paths.human_check}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="scrutineer", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -196,6 +269,21 @@ def build_parser() -> argparse.ArgumentParser:
     budget = sub.add_parser("budget", help="show ledger spend, optionally reconcile with billing")
     budget.add_argument("--reconcile", action="store_true")
 
+    judge = sub.add_parser("judge", help="grade F6, F8 and unparseable answers with the local judge")
+    judge.add_argument("--run-id", action="append", help="repeatable; default all runs")
+    judge.add_argument("--base-url", default="http://127.0.0.1:8080/v1")
+    judge.add_argument("--concurrency", type=int, default=2)
+
+    grade = sub.add_parser("grade", help="grade all runs and write data/results.json")
+    grade.add_argument("--update-hash", action="store_true", help="also rewrite results.sha256")
+
+    sub.add_parser("verify", help="recompute results.json and check it against results.sha256")
+
+    human = sub.add_parser("export-human-check", help="blind 20%% sample of judgements for labelling")
+    human.add_argument("--fraction", type=float, default=0.2)
+    human.add_argument("--seed", type=int, default=0)
+    human.add_argument("--force", action="store_true")
+
     return parser
 
 
@@ -204,6 +292,10 @@ HANDLERS: dict[str, Handler] = {
     "build": cmd_build,
     "run": cmd_run,
     "budget": cmd_budget,
+    "judge": cmd_judge,
+    "grade": cmd_grade,
+    "verify": cmd_verify,
+    "export-human-check": cmd_export_human_check,
 }
 
 

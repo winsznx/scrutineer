@@ -38,7 +38,7 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py312"
 src = ["src", "tests"]
 
@@ -55,3 +55,7 @@ packages = ["scrutineer"]
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "transformers.*", "torch.*", "datasets.*"]
 ignore_missing_imports = true
+
+[tool.ruff.lint.per-file-ignores]
+# The judge prompt is a versioned artefact; wrapping its lines would change the prompt.
+"src/scrutineer/grade/judge.py" = ["E501"]

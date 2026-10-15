@@ -249,6 +249,9 @@ class Runner:
                     raise StopRun(f"HTTP 402 from server: {response.text[:300]}")
                 if response.status_code in RETRYABLE or _is_transient(response):
                     last_error = response.text[:300]
+                    print(f"{_now()} retry {item['item_id']} attempt {attempt} HTTP "
+                          f"{response.status_code} after {latency_ms} ms: {last_error[:90]!r}",
+                          file=sys.stderr)
                     await self._backoff(attempt, response.headers.get("retry-after"))
                     continue
                 if response.status_code >= 400:

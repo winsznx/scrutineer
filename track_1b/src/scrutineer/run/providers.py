@@ -56,10 +56,10 @@ def resolve_provider(name: str) -> Provider:
             model_suffix=":publicai",
         )
     if name == "env":
-        base = os.environ.get("LLM_BASE_URL")
-        if not base:
+        env_base = os.environ.get("LLM_BASE_URL")
+        if not env_base:
             raise SystemExit("--provider env needs LLM_BASE_URL")
-        return Provider(name="env", base_url=base, api_key=os.environ.get("LLM_API_KEY"))
+        return Provider(name="env", base_url=env_base, api_key=os.environ.get("LLM_API_KEY"))
     raise SystemExit(f"unknown provider {name!r}; use publicai, hf or env")
 
 
