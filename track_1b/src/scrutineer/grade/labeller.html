@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scrutineer labelling</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d9d6; --paper:#fbfbf9; --mark:#fff1a8; --red:#D52B1E; --ok:#1a1a1a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#ecece8; --muted:#a3a39e; --rule:#3a3a37; --paper:#151514; --mark:#5c5114; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 "IBM Plex Sans", -apple-system, Helvetica, Arial, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 80px; }
+  header { display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--ink); padding-bottom:8px; gap:12px; flex-wrap:wrap; }
+  h1 { font-size:18px; margin:0; }
+  .progress { font-family: ui-monospace, Menlo, monospace; font-size:14px; color:var(--muted); }
+  .bar { height:3px; background:var(--rule); margin:8px 0 20px; } .bar > div { height:3px; background:var(--ink); width:0; }
+  .label { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:18px 0 4px; }
+  .question { white-space:pre-wrap; font-size:14px; color:var(--muted); border-left:2px solid var(--rule); padding-left:12px; }
+  .gold { font-size:18px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:10px 0; }
+  .response { font-size:20px; line-height:1.55; }
+  mark { background:var(--mark); color:inherit; padding:0 2px; }
+  .numbers { font-family: ui-monospace, Menlo, monospace; font-size:14px; margin-top:6px; }
+  .numbers .far { color:var(--red); }
+  .suggest { font-size:15px; } .suggest b { font-family: ui-monospace, Menlo, monospace; }
+  .flag { color:var(--red); }
+  .keys { display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }
+  button { font:inherit; font-size:15px; background:transparent; color:var(--ink); border:1px solid var(--ink); padding:8px 14px; cursor:pointer; }
+  button.chosen { background:var(--ink); color:var(--paper); }
+  button:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+  kbd { font-family: ui-monospace, Menlo, monospace; font-size:12px; border:1px solid var(--rule); padding:0 4px; margin-right:6px; }
+  .status { margin-top:14px; font-size:14px; color:var(--muted); min-height:1.5em; }
+  .help { margin-top:30px; font-size:13px; color:var(--muted); border-top:1px solid var(--rule); padding-top:10px; }
+  .done { font-size:20px; padding:40px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Scrutineer: human check</h1>
+    <span class="progress" id="progress"></span>
+  </header>
+  <div class="bar"><div id="bar"></div></div>
+  <div id="card"></div>
+  <div class="keys">
+    <button data-grade="correct"><kbd>1</kbd>correct</button>
+    <button data-grade="incorrect"><kbd>2</kbd>incorrect</button>
+    <button data-grade="not_attempted"><kbd>3</kbd>not attempted</button>
+    <button id="accept"><kbd>Enter</kbd>use suggestion</button>
+    <button id="prev"><kbd>&larr;</kbd>back</button>
+    <button id="next"><kbd>&rarr;</kbd>skip</button>
+    <button id="clear"><kbd>U</kbd>clear</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="help">
+    <b>correct</b>: right outcome (accepted / rejected) and no wrong fact; a yes share within 2 points counts as right.
+    <b>incorrect</b>: wrong outcome, or any wrong fact (a yes share more than 2 points off).
+    <b>not attempted</b>: no answer ("I don't know") and nothing wrong stated.
+    A "majority of X % of the votes" for a rejected proposal means X % voted no, so the yes share is 100 − X.
+    Every label is saved the moment you press a key.
+  </div>
+</main>
+<script>
+const OUTCOME = /\b(angenommen|abgelehnt|verworfen|zugestimmt|gutgeheissen|gutgeheißen|accept\w*|approv\w*|adopt\w*|reject\w*|refus\w*|rejet\w*|repouss\w*|accett\w*|accolt\w*|respint\w*|bocciat\w*|rifiutat\w*|nicht|pas|non|not|ja|nein|yes|no|oui|sì)\b/gi;
+const PERCENT = /(\d{1,3}(?:[.,]\d+)?)\s?(?:%|prozent|pour\s?cent|per\s?cento|percent)/gi;
+let rows = [], index = 0;
+
+const esc = s => (s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const highlight = s => esc(s).replace(PERCENT, m => `<mark>${m}</mark>`).replace(OUTCOME, m => `<mark>${m}</mark>`);
+const goldShare = gold => { const m = gold.match(/Yes share: ([\d.]+)%/); return m ? parseFloat(m[1]) : null; };
+
+function numbers(row) {
+  const gold = goldShare(row.gold);
+  if (gold === null) return "";
+  const found = [...row.response.matchAll(PERCENT)].map(m => parseFloat(m[1].replace(",", ".")));
+  if (!found.length) return "";
+  return found.map(v => {
+    const dYes = Math.abs(v - gold), dNo = Math.abs((100 - v) - gold);
+    const cls = Math.min(dYes, dNo) > 2 ? "far" : "";
+    return `<span class="${cls}">${v}%: ${dYes.toFixed(1)} pts from the yes share, ${dNo.toFixed(1)} pts if it is the no share</span>`;
+  }).join("<br>");
+}
+
+function render() {
+  const done = rows.filter(r => r.human_grade).length;
+  document.getElementById("progress").textContent = `${done} / ${rows.length} labelled · row ${index + 1}`;
+  document.getElementById("bar").style.width = `${100 * done / rows.length}%`;
+  if (!rows.length) return;
+  const row = rows[index];
+  const nums = numbers(row);
+  document.getElementById("card").innerHTML = `
+    <div class="label">Question put to the model</div><div class="question">${esc(row.question)}</div>
+    <div class="label">Gold (official record)</div><div class="gold">${highlight(row.gold)}</div>
+    <div class="label">Model's answer</div><div class="response">${highlight(row.response) || "<i>(empty)</i>"}</div>
+    ${nums ? `<div class="numbers">${nums}</div>` : ""}
+    <div class="label">Suggestion (Claude, blind second rater)</div>
+    <div class="suggest"><b>${esc(row.prelabel)}</b>${row.prelabel_note ? ` <span class="flag">· flagged: ${esc(row.prelabel_note)}</span>` : ""}</div>`;
+  document.querySelectorAll("button[data-grade]").forEach(b => b.classList.toggle("chosen", b.dataset.grade === row.human_grade));
+  document.getElementById("status").textContent = row.human_grade ? `Your label: ${row.human_grade} (saved ${row.labelled_at})` : "Not labelled yet.";
+}
+
+async function save(grade) {
+  const row = rows[index];
+  const res = await fetch("/label", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({row_id: row.row_id, grade})});
+  if (!res.ok) { document.getElementById("status").textContent = "Save failed: " + await res.text(); return; }
+  row.human_grade = grade; row.labelled_at = (await res.json()).labelled_at;
+  if (grade) {
+    const next = rows.findIndex((r, i) => i > index && !r.human_grade);
+    const first = rows.findIndex(r => !r.human_grade);
+    if (next >= 0) index = next; else if (first >= 0) index = first;
+    else { render(); document.getElementById("card").innerHTML = '<div class="done">All rows labelled. Tell Claude you are done.</div>'; return; }
+  }
+  render();
+}
+
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const keys = {"1": "correct", "2": "incorrect", "3": "not_attempted"};
+  if (keys[e.key]) { save(keys[e.key]); e.preventDefault(); }
+  else if (e.key === "Enter") { save(rows[index].prelabel); e.preventDefault(); }
+  else if (e.key === "ArrowLeft") { index = Math.max(0, index - 1); render(); }
+  else if (e.key === "ArrowRight") { index = Math.min(rows.length - 1, index + 1); render(); }
+  else if (e.key.toLowerCase() === "u") { save(""); }
+});
+document.querySelectorAll("button[data-grade]").forEach(b => b.onclick = () => save(b.dataset.grade));
+document.getElementById("accept").onclick = () => save(rows[index].prelabel);
+document.getElementById("prev").onclick = () => { index = Math.max(0, index - 1); render(); };
+document.getElementById("next").onclick = () => { index = Math.min(rows.length - 1, index + 1); render(); };
+document.getElementById("clear").onclick = () => save("");
+
+fetch("/rows").then(r => r.json()).then(data => {
+  rows = data;
+  const first = rows.findIndex(r => !r.human_grade);
+  index = first >= 0 ? first : 0;
+  render();
+});
+</script>
+</body>
+</html>
