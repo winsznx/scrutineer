@@ -231,3 +231,10 @@ def test_pending_items_keeps_the_given_order() -> None:
         {"item_id": "5-F3-fr", "anr": "5", "family": "F3", "lang": "fr"},
     ]
     assert [i["item_id"] for i in pending_items(items, {}, retry_failed=False)] == ["9-F8-de", "1-F1-de", "5-F3-fr"]
+
+
+def test_empty_base_url_falls_back_to_public_ai(monkeypatch: pytest.MonkeyPatch) -> None:
+    from scrutineer.run.providers import resolve_provider
+
+    monkeypatch.setenv("LLM_BASE_URL", "")
+    assert resolve_provider("publicai").chat_url == "https://api.publicai.co/v1/chat/completions"

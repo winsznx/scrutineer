@@ -50,7 +50,8 @@ def _publicai_key() -> str | None:
 def resolve_provider(name: str) -> Provider:
     """`publicai` and `hf` are built in. `env` uses LLM_BASE_URL and LLM_API_KEY as given."""
     if name == "publicai":
-        base = os.environ.get("LLM_BASE_URL", "https://api.publicai.co/v1")
+        # An empty LLM_BASE_URL (docker-compose passes unset variables as "") means the default.
+        base = os.environ.get("LLM_BASE_URL") or "https://api.publicai.co/v1"
         return Provider(
             name="publicai",
             base_url=base,
