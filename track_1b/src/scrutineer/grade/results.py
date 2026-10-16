@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from scrutineer.grade.grade import grade_item
-from scrutineer.grade.judge import read_judgements
+from scrutineer.grade.judge import JUDGE_PROMPT_VERSION, read_judgements
 from scrutineer.grade.metrics import (
     CORE_LANGS,
     abstention,
@@ -82,15 +82,21 @@ def human_agreement(paths: Paths) -> dict[str, Any]:
         key = {row["row_id"]: row for row in csv.DictReader(handle)}
     with paths.human_check.open(encoding="utf-8") as handle:
         labels = {row["row_id"]: row for row in csv.DictReader(handle)}
+    current = _current_judge_grades(paths, key)
     pairs: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    pairs_v1_0: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for row_id, row in labels.items():
         human = row.get("human_grade", "").strip().lower()
         if human not in {"correct", "incorrect", "not_attempted"}:
             continue
         mapping = key[row_id]
-        pairs[mapping["lang"]].append((mapping["judge_grade"], human))
-        pairs["all"].append((mapping["judge_grade"], human))
-    labelled = len(pairs["all"])
+        # The key holds the verdict shown at export time (judge 1.0.0).
+        pairs_v1_0[mapping["lang"]].append((mapping["judge_grade"], human))
+        pairs_v1_0["all"].append((mapping["judge_grade"], human))
+        if row_id in current:
+            pairs[mapping["lang"]].append((current[row_id], human))
+            pairs["all"].append((current[row_id], human))
+    labelled = len(pairs_v1_0["all"])
     if labelled == 0:
         return {"status": "awaiting_labels", "sample_size": len(key)}
 
@@ -107,8 +113,24 @@ def human_agreement(paths: Paths) -> dict[str, Any]:
         "status": "complete" if labelled == len(key) else "partial",
         "sample_size": len(key),
         "labelled": labelled,
+        "judge_prompt_version": JUDGE_PROMPT_VERSION,
         "by_lang": {lang: summarise(group) for lang, group in sorted(pairs.items())},
+        "judge_v1_0_by_lang": {lang: summarise(group) for lang, group in sorted(pairs_v1_0.items())},
     }
+
+
+def _current_judge_grades(paths: Paths, key: dict[str, dict[str, str]]) -> dict[str, str]:
+    """Verdicts of the current judge version for the sampled rows, from the live judgement files."""
+    by_run: dict[str, dict[str, Any]] = {}
+    grades: dict[str, str] = {}
+    for row_id, mapping in key.items():
+        run = mapping["run_id"]
+        if run not in by_run:
+            by_run[run] = read_judgements(paths.judgements / f"{run}.jsonl")
+        judgement = by_run[run].get(mapping["item_id"])
+        if judgement is not None:
+            grades[row_id] = judgement["grade"]
+    return grades
 
 
 def second_rater_agreement(paths: Paths) -> dict[str, Any]:
@@ -138,12 +160,19 @@ def second_rater_agreement(paths: Paths) -> dict[str, Any]:
             groups["all"].append((pair[0], pair[1]))
         return {name: summarise(group) for name, group in sorted(groups.items())}
 
-    judge_claude = [(key[i]["judge_grade"], claude[i], key[i]["family"], key[i]["lang"]) for i in key if i in claude]
+    current = _current_judge_grades(paths, key)
+    rated = [i for i in key if i in claude]
+    judge_claude = [(current[i], claude[i], key[i]["family"], key[i]["lang"]) for i in rated if i in current]
+    judge_v1_0_claude = [(key[i]["judge_grade"], claude[i], key[i]["family"], key[i]["lang"]) for i in rated]
     valid = {"correct", "incorrect", "not_attempted"}
     claude_human = [(claude[i], human[i], key[i]["family"], key[i]["lang"]) for i in key if human.get(i) in valid]
     return {
         "rater": "Claude (Fable 5.1), blind to judge verdicts, run and language",
         "judge_vs_claude": {"by_family": by_group(judge_claude, 2), "by_lang": by_group(judge_claude, 3)},
+        "judge_v1_0_vs_claude": {
+            "by_family": by_group(judge_v1_0_claude, 2),
+            "by_lang": by_group(judge_v1_0_claude, 3),
+        },
         "claude_vs_human": by_group(claude_human, 2) if claude_human else {"status": "awaiting_labels"},
     }
 
