@@ -219,3 +219,18 @@ ledger, `data/spend_ledger_hf.jsonl`, separate from the Public AI credit. Calibr
 first 200 items plus 3 probes were estimated at $0.026, and HF billing showed $0.03
 (rounded to the cent). The cap is set assuming the real price may be up to 15% above list.
 The HF account is prepaid ($10.00 credit, automatic recharge off), so no card is charged.
+
+## D20. R3 budget reallocated after R1 left Public AI
+
+R3 stopped at its $0.40 Public AI cap with 6,294 of 6,716 items answered; the 420 left were F8
+summaries, the longest answers. The $1.20 set aside for R1 on Public AI went unused once R1
+moved to Hugging Face (D19), so R3 got a further $0.10 for its remaining items. Total Public AI
+spend stays far below the $2.00 starter credit.
+
+## D21. A malformed HTTP 200 body crashed R1 once
+
+At 18:03 UTC on 15 October, one Hugging Face response came back with status 200 and a
+truncated JSON body. The runner did not catch the parse error, the run exited, and the
+supervisor treated the exit as fatal, so R1 sat idle until it was noticed at 02:20 UTC on
+16 October. The runner now treats a malformed 200 as a transient fault and retries it, with
+a test. No response was lost or fabricated: the failed request was never recorded.

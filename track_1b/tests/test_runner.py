@@ -191,3 +191,21 @@ def test_upstream_capacity_400_is_retried(tmp_path: Path) -> None:
     runner = Runner(config, guard, tmp_path / "T.jsonl", httpx.MockTransport(server), sleep_base_s=0)
     asyncio.run(runner.run(make_items(1)))
     assert read_records(tmp_path / "T.jsonl")["400-F1-de"]["attempts"] == 2
+
+
+def test_malformed_200_body_is_retried(tmp_path: Path) -> None:
+    calls = {"n": 0}
+
+    def server(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return httpx.Response(200, text='{"id": "x", "choices": [{"message": {"content": "abgel')
+        return httpx.Response(200, json=ok_payload(request))
+
+    config = RunConfig(run_id="T", model="m", provider=PROVIDER, price=(1.0, 1.0), workers=1, rpm=60_000)
+    guard = BudgetGuard(SpendLedger(tmp_path / "ledger.jsonl"), credit_usd=2.0)
+    runner = Runner(config, guard, tmp_path / "T.jsonl", httpx.MockTransport(server), sleep_base_s=0)
+    asyncio.run(runner.run(make_items(1)))
+    record = read_records(tmp_path / "T.jsonl")["400-F1-de"]
+    assert record["status"] == "ok"
+    assert record["attempts"] == 2

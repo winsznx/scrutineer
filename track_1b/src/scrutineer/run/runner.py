@@ -275,8 +275,15 @@ class Runner:
                 if response.status_code >= 400:
                     last_error = response.text[:300]
                     break
-                payload = response.json()
-                content, reasoning, finish = _extract(payload)
+                try:
+                    payload = response.json()
+                    content, reasoning, finish = _extract(payload)
+                except (ValueError, KeyError, IndexError, TypeError) as exc:
+                    # A 200 with a malformed body is a transport fault, not an answer: retry it.
+                    last_error = f"malformed 200 response ({type(exc).__name__}): {response.text[:200]}"
+                    print(f"{_now()} retry {item['item_id']} attempt {attempt}: {last_error[:120]!r}", file=sys.stderr)
+                    await self._backoff(attempt)
+                    continue
                 usage = payload.get("usage") or {}
                 request_id = payload.get("id") or response.headers.get("inference-id")
                 actual = _billed_cost(response)
