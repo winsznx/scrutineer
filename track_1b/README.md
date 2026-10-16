@@ -4,10 +4,43 @@ A benchmark that asks Apertus 1.5 what the Swiss people decided in every federal
 1990, in four languages, and shows where and why it gets them wrong.
 
 <!-- scrutineer:begin headline -->
-On F1 (did the vote pass?) in German, French, Italian and English, Apertus 1.5 70B is right on **60.2%** of votes the Federal Council won and **48.5%** of votes it lost, a gap of **11.7 points** (z = 1.69, p = 0.0917; n = 221 and 66 answers). Pre-registered claim C1: **INCONCLUSIVE**.
+On F1 (did the vote pass?) in German, French, Italian and English, Apertus 1.5 70B is right on **64.7%** of votes the Federal Council won and **55.9%** of votes it lost, a gap of **8.8 points** (z = 2.64, p = 0.0083; n = 1069 and 261 answers). Pre-registered claim C1: **FAILED**.
 <!-- scrutineer:end headline -->
 
-![F1 accuracy on votes the Federal Council won and lost](docs/figures/fig1_accuracy_gov_lost.png)
+The claim we registered before the first request, that Apertus repeats the government's line
+on votes the government lost, failed. The data shows something else. Asked in French or English,
+Apertus calls almost every proposal rejected, while in German it answers close to the true rate.
+The same official 70B weights, served by two deployers at temperature 0, give a different answer
+on about one question in twelve. Public AI's `apertus-v1.5-8b` id answers like the 70B, so no 8B
+result is reported (`docs/DECISIONS.md`, D24).
+
+<!-- scrutineer:begin language_table -->
+| Model | Language | Says accepted | Gold accepted | Accuracy | Abstained |
+|---|---|--:|--:|--:|--:|
+| 70B (Featherless) | German | 55.3% | 46.1% | 76.3% (n=334) | 4.2% |
+| 70B (Featherless) | English | 2.2% | 45.4% | 54.3% (n=328) | 4.0% |
+| 70B (Featherless) | French | 4.7% | 46.1% | 54.2% (n=334) | 3.9% |
+| 70B (Featherless) | Italian | 33.3% | 46.1% | 67.1% (n=334) | 5.7% |
+| 70B (Featherless) | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
+| Public AI "8B" route | German | 55.6% | 46.1% | 76.0% (n=334) | 4.2% |
+| Public AI "8B" route | English | 2.2% | 45.4% | 54.3% (n=328) | 4.0% |
+| Public AI "8B" route | French | 5.0% | 46.1% | 54.5% (n=334) | 3.9% |
+| Public AI "8B" route | Italian | 33.5% | 46.1% | 67.1% (n=334) | 5.4% |
+| Public AI "8B" route | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
+| Public AI "8B" route, thinking | German | 47.2% | 46.1% | 75.7% (n=334) | 4.2% |
+| Public AI "8B" route, thinking | English | 15.8% | 45.1% | 59.9% (n=319) | 5.0% |
+| Public AI "8B" route, thinking | French | 2.2% | 46.2% | 54.1% (n=329) | 3.0% |
+| Public AI "8B" route, thinking | Italian | 24.5% | 46.3% | 64.8% (n=324) | 1.9% |
+| Public AI "8B" route, thinking | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
+| 70B thinking (Featherless) | German | 46.2% | 30.8% | 69.2% (n=13) | 0.0% |
+| 70B thinking (Featherless) | English | 33.3% | 44.4% | 66.7% (n=9) | 0.0% |
+| 70B thinking (Featherless) | French | 7.7% | 30.8% | 76.9% (n=13) | 0.0% |
+| 70B thinking (Featherless) | Italian | 46.2% | 30.8% | 84.6% (n=13) | 0.0% |
+
+Votes where German, French, Italian and English give the same answer: 70B (Featherless): 135 of 309 (43.7%); Public AI "8B" route: 137 of 310 (44.2%); Public AI "8B" route, thinking: 153 of 303 (50.5%); 70B thinking (Featherless): 5 of 9 (55.6%).
+<!-- scrutineer:end language_table -->
+
+![Share of F1 answers saying accepted, by language](docs/figures/fig5_language_bias.png)
 
 **Dataset** https://huggingface.co/datasets/winsznx/scrutineer ·
 **Report** [Scrutineer_Report.pdf](Scrutineer_Report.pdf) ·
