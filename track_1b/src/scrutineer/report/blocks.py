@@ -171,11 +171,62 @@ def human_table(results: Results) -> str:
     human = results["human_check"]
     if human.get("status") in {"not_exported", "awaiting_labels"}:
         return f"_Human check status: {human['status'].replace('_', ' ')}._\n"
-    rows = [f"Labelled {human['labelled']} of {human['sample_size']} sampled judgements ({human['status']}).", "",
-            "| Language | n | Raw agreement | Cohen's κ |", "|---|--:|--:|--:|"]
+    second = results.get("second_rater_agreement", {})
+    claude_human = second.get("claude_vs_human", {}).get("all", {})
+    rows = [f"Labelled {human['labelled']} of {human['sample_size']} sampled judgements ({human['status']}). "
+            f"The labeller saw a blind Claude pre-label; human and Claude agree on "
+            f"{pct(claude_human.get('raw_agreement'))} of rows, so judge versus human is close to judge versus "
+            "Claude and is not an independent second annotation.", "",
+            f"| Language | n | Judge {human.get('judge_prompt_version', '')} vs human | κ | Judge 1.0.0 vs human | κ |",
+            "|---|--:|--:|--:|--:|--:|"]
     for lang, s in human["by_lang"].items():
+        old = human.get("judge_v1_0_by_lang", {}).get(lang, {})
         rows.append(f"| {LANG_NAMES.get(lang, lang)} | {s['n']} | {pct(s['raw_agreement'])} | "
-                    f"{num(s['cohen_kappa'], 3)} |")
+                    f"{num(s['cohen_kappa'], 3)} | {pct(old.get('raw_agreement'))} | "
+                    f"{num(old.get('cohen_kappa'), 3)} |")
+    return "\n".join(rows) + "\n"
+
+
+def judge_versions_table(results: Results) -> str:
+    rows = ["| Run | F6 judge 1.0.0 | F6 judge 1.1.0 | F8 judge 1.0.0 | F8 judge 1.1.0 |", "|---|--:|--:|--:|--:|"]
+    for run in _runs(results):
+        v = results.get("judge_versions", {}).get(run, {})
+        cells = [pct(v.get(f, {}).get(ver, {}).get("accuracy")) for f in ("F6", "F8") for ver in ("1.0.0", "current")]
+        rows.append(f"| {results['runs'][run]['label']} | " + " | ".join(cells) + " |")
+    return "\n".join(rows) + "\n"
+
+
+def thinking_table(results: Results) -> str:
+    rows = ["| Run | Language | Answers with a trace | Mean output tokens | Cut off at 2,000 |",
+            "|---|---|--:|--:|--:|"]
+    for run, by_lang in results.get("thinking_traces", {}).items():
+        for lang, t in by_lang.items():
+            rows.append(f"| {results['runs'][run]['label']} | {LANG_NAMES.get(lang, lang)} | "
+                        f"{pct(t['share_with_trace'])} | {num(t['mean_completion_tokens'], 0)} | "
+                        f"{t['truncated_at_max_tokens']} |")
+    return "\n".join(rows) + "\n"
+
+
+def deployer_text(results: Results) -> str:
+    d = results.get("deployer_agreement")
+    if not d:
+        return "_No deployer comparison available._\n"
+    return (f"The same official 70B weights, asked the same {d['n']} F1 questions at temperature 0 on two "
+            f"deployers (Public AI, then Featherless through the Hugging Face router), gave the same parsed "
+            f"answer {pct(d['parsed_agreement'])} of the time. The rest flip between accepted and rejected.\n")
+
+
+def r4_table(results: Results) -> str:
+    pr = results.get("r4_vs_r1")
+    if not pr:
+        return "_R4 not run._\n"
+    rows = ["| Items (F1 and F3, answered by both) | n | 70B | 70B thinking | Only 70B right | Only thinking right |",
+            "|---|--:|--:|--:|--:|--:|"]
+    for label in ("gov_won", "gov_lost"):
+        c = pr[label]
+        side = "won" if label == "gov_won" else "lost"
+        rows.append(f"| Government {side} | {c['n']} | {pct(c.get('R1_accuracy'))} | "
+                    f"{pct(c.get('R4_accuracy'))} | {c['only_right_correct']} | {c['only_left_correct']} |")
     return "\n".join(rows) + "\n"
 
 
@@ -264,6 +315,10 @@ BLOCKS: dict[str, Callable[[Results], str]] = {
     "replay": replay,
     "language_table": language_table,
     "order_swap_table": order_swap_table,
+    "judge_versions_table": judge_versions_table,
+    "thinking_table": thinking_table,
+    "deployer_text": deployer_text,
+    "r4_table": r4_table,
 }
 
 

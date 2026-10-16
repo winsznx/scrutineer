@@ -232,6 +232,81 @@ def robustness(paths: Paths, graded: dict[str, list[dict[str, Any]]]) -> dict[st
     return {"order_swap": {"model": meta["model"], "compared_with": "R2", "by_lang": order_swap(swapped, original)}}
 
 
+def deployer_agreement(paths: Paths, items: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    """R1 on Featherless against R1's first route (Public AI) on the items both answered."""
+    first = paths.responses / "R1_publicai.jsonl"
+    if not first.exists() or not (paths.responses / "R1.jsonl").exists():
+        return None
+    a, b = read_records(first), read_records(paths.responses / "R1.jsonl")
+    shared = sorted(k for k in a if a[k]["status"] == "ok" and b.get(k, {}).get("status") == "ok")
+    labels = [(grade_item(items[k], a[k], None).get("parsed"), grade_item(items[k], b[k], None).get("parsed"))
+              for k in shared]
+    return {
+        "first_route": "publicai", "second_route": "hf/featherless-ai", "n": len(shared),
+        "parsed_agreement": r(sum(x == y for x, y in labels) / len(labels)) if labels else None,
+        "exact_text_agreement": r(sum(a[k]["response"].strip() == b[k]["response"].strip() for k in shared)
+                                  / len(shared)) if shared else None,
+    }
+
+
+def thinking_traces(paths: Paths, run: str) -> dict[str, Any]:
+    """Length of the reasoning trace per language, and how often max_tokens cut it off."""
+    records = [rec for rec in read_records(paths.responses / f"{run}.jsonl").values() if rec["status"] == "ok"]
+    out: dict[str, Any] = {}
+    for lang in ("de", "fr", "it", "en", "rm"):
+        subset = [rec for rec in records if rec["item_id"].split("-")[-1] == lang]
+        if not subset:
+            continue
+        traced = [len(rec.get("reasoning") or "") for rec in subset]
+        tokens = [int((rec.get("usage") or {}).get("completion_tokens", 0)) for rec in subset]
+        out[lang] = {
+            "n": len(subset),
+            "share_with_trace": r(sum(t > 0 for t in traced) / len(subset)),
+            "mean_completion_tokens": r(sum(tokens) / len(tokens)),
+            "truncated_at_max_tokens": sum(rec.get("finish_reason") == "length" for rec in subset),
+        }
+    return out
+
+
+def paired_runs(graded: dict[str, list[dict[str, Any]]], left: str, right: str) -> dict[str, Any] | None:
+    """Accuracy of two runs on exactly the F1/F3 items both answered, split by gov_lost."""
+    if left not in graded or right not in graded:
+        return None
+    a = {g["item_id"]: g for g in graded[left] if g.get("grade")}
+    b = {g["item_id"]: g for g in graded[right] if g.get("grade")}
+    shared = [k for k in a if k in b and a[k]["family"] in {"F1", "F3"} and a[k]["strata"]["gov_lost"] is not None]
+    out: dict[str, Any] = {"left": left, "right": right}
+    for label, value in (("gov_won", 0), ("gov_lost", 1)):
+        keys = [k for k in shared if a[k]["strata"]["gov_lost"] == value]
+        n = len(keys)
+        out[label] = {
+            "n": n,
+            f"{left}_accuracy": r(sum(a[k]["grade"] == "correct" for k in keys) / n) if n else None,
+            f"{right}_accuracy": r(sum(b[k]["grade"] == "correct" for k in keys) / n) if n else None,
+            "only_left_correct": sum(a[k]["grade"] == "correct" and b[k]["grade"] != "correct" for k in keys),
+            "only_right_correct": sum(b[k]["grade"] == "correct" and a[k]["grade"] != "correct" for k in keys),
+        }
+    return out
+
+
+def judge_versions(paths: Paths, items: dict[str, dict[str, Any]], run: str) -> dict[str, Any]:
+    """F6 and F8 accuracy under the archived judge 1.0.0 verdicts and the current ones."""
+    records = read_records(paths.responses / f"{run}.jsonl")
+    versions = {"1.0.0": paths.judgements / "v1.0" / f"{run}.jsonl", "current": paths.judgements / f"{run}.jsonl"}
+    out: dict[str, Any] = {}
+    for name, path in versions.items():
+        judgements = read_judgements(path)
+        for family in ("F6", "F8"):
+            graded = [grade_item(items[k], rec, judgements.get(k)) for k, rec in records.items()
+                      if rec["status"] == "ok" and items[k]["family"] == family]
+            scored = [g for g in graded if g.get("grade")]
+            out.setdefault(family, {})[name] = {
+                "n": len(scored),
+                "accuracy": r(sum(g["grade"] == "correct" for g in scored) / len(scored)) if scored else None,
+            }
+    return out
+
+
 def _optional_json(path: Path) -> Any:
     return json.loads(path.read_text()) if path.exists() else None
 
@@ -299,6 +374,10 @@ def assemble(paths: Paths) -> dict[str, Any]:
         "claims": claims,
         "baselines": baselines(items),
         "robustness": robustness(paths, graded),
+        "deployer_agreement": deployer_agreement(paths, items),
+        "thinking_traces": {run: thinking_traces(paths, run) for run in graded if runs[run]["thinking"]},
+        "r4_vs_r1": paired_runs(graded, "R4", "R1"),
+        "judge_versions": {run: judge_versions(paths, items, run) for run in graded},
         "judge": judge_summary(paths, graded),
         "human_check": human_agreement(paths),
         "second_rater_agreement": second_rater_agreement(paths),
