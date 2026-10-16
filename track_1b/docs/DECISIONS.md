@@ -291,3 +291,11 @@ Consequences:
   needs the gated licence accepted on the author's Hugging Face account.
 - The ~92% agreement between routes is itself a measurement: the same weights served by
   different stacks at temperature 0 give a different F1 outcome on about 1 answer in 12.
+
+## D25. R4 time limit moved from 07:15 to 04:45 UTC
+
+To leave time for judging, grading, verification and publishing before the 10:00 UTC
+deadline, R4's time limit was brought forward to 04:45 UTC on 16 October. The decision was
+made at 03:10 UTC, before R4 reached the end of its F8 phase, and without looking at R4's
+results. The pre-registered order is unchanged: the run stops wherever it is in that order,
+and the report states coverage per phase.
