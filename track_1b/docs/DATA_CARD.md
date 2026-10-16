@@ -52,7 +52,7 @@ By family: F1 1,361 · F2 1,330 · F3 1,330 · F4 797 · F5 334 · F6 214 · F7 
 
 By language: German 1,928 · English 1,565 · French 1,594 · Italian 1,594 · Romansh 35.
 
-`items.jsonl` sha256 `fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee`.
+`items.jsonl` sha256 `fe3ee9af2f440fa3…` (full hash in `data/items.manifest.json`).
 <!-- scrutineer:end dataset_stats -->
 
 ## Dataset Details
@@ -216,7 +216,15 @@ opt-out lists (see `docs/CONTAMINATION.md`).
   (`docs/CONTAMINATION.md`).
 
 <!-- scrutineer:begin contamination -->
-_Contamination check not run yet._
+Apertus robots.txt opt-out lists: `fw1_domains.txt` (487,666 hosts): no swissvotes.ch or admin.ch host; `fw2_domains.txt` (333,971 hosts): no swissvotes.ch or admin.ch host.
+
+| Language | Prompts | With a 13-gram hit | Inside the title only | Touching template | Titles found verbatim |
+|---|--:|--:|--:|--:|--:|
+| German | 1,928 | 6 | 6 | 0 | 1 of 337 |
+| French | 1,594 | 9 | 8 | 1 | 0 of 337 |
+| Italian | 1,594 | 9 | 9 | 0 | 0 of 338 |
+
+Sample: 100,000 FineWeb-2 documents per language (revision `af9c1333`, seed 0). Details in `docs/CONTAMINATION.md`.
 <!-- scrutineer:end contamination -->
 
 #### Data Instance Licenses
@@ -248,7 +256,7 @@ Human check: a seeded random 20% of all judged items is exported to `human_check
 shuffled order. Each row shows only an opaque id, the question, the gold facts and the answer.
 Model, run and judge verdict are hidden in a separate key file. The labeller assigns
 `correct`, `incorrect` or `not_attempted` under the same SimpleQA rules the judge uses, and
-records a timestamp per row.
+records a timestamp per row. The full protocol, with worked examples, is `docs/ANNOTATION_GUIDE.md`.
 
 <!-- scrutineer:begin human_table -->
 _Human check status: not exported._
