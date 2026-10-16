@@ -35,11 +35,14 @@ from scrutineer.run.runner import read_records
 
 SCHEMA_VERSION = "1.0.0"
 CLAIM_RUN = "R1"
+# R2 and R3 used Public AI's `swiss-ai/apertus-v1.5-8b` id. Its answers are word-for-word
+# identical to the official 70B on most items (see `route_identity` and DECISIONS D24), so the
+# labels name the route that was called, not a model size that could not be verified.
 RUN_LABELS = {
-    "R1": "Apertus 1.5 70B",
-    "R2": "Apertus 1.5 8B",
-    "R3": "Apertus 1.5 8B thinking",
-    "R4": "Apertus 1.5 70B thinking",
+    "R1": "70B (Featherless)",
+    "R2": "Public AI \"8B\" route",
+    "R3": "Public AI \"8B\" route, thinking",
+    "R4": "70B thinking (Featherless)",
 }
 
 
@@ -307,6 +310,24 @@ def judge_versions(paths: Paths, items: dict[str, dict[str, Any]], run: str) -> 
     return out
 
 
+def route_identity(paths: Paths) -> dict[str, Any]:
+    """How often two runs return the exact same text for the same item (temperature 0)."""
+    def load(run: str) -> dict[str, str]:
+        path = paths.responses / f"{run}.jsonl"
+        if not path.exists():
+            return {}
+        return {k: rec["response"].strip() for k, rec in read_records(path).items() if rec["status"] == "ok"}
+
+    runs = {run: load(run) for run in ("R1", "R1_publicai", "R2", "R3", "R4")}
+    out: dict[str, Any] = {}
+    for left, right in (("R1", "R2"), ("R1_publicai", "R2"), ("R1", "R1_publicai"), ("R3", "R4")):
+        shared = [k for k in runs[left] if k in runs[right]]
+        if shared:
+            same = sum(runs[left][k] == runs[right][k] for k in shared)
+            out[f"{left}~{right}"] = {"n": len(shared), "identical_text": r(same / len(shared))}
+    return out
+
+
 def _optional_json(path: Path) -> Any:
     return json.loads(path.read_text()) if path.exists() else None
 
@@ -375,6 +396,7 @@ def assemble(paths: Paths) -> dict[str, Any]:
         "baselines": baselines(items),
         "robustness": robustness(paths, graded),
         "deployer_agreement": deployer_agreement(paths, items),
+        "route_identity": route_identity(paths),
         "thinking_traces": {run: thinking_traces(paths, run) for run in graded if runs[run]["thinking"]},
         "r4_vs_r1": paired_runs(graded, "R4", "R1"),
         "judge_versions": {run: judge_versions(paths, items, run) for run in graded},

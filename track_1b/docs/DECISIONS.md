@@ -263,3 +263,31 @@ See CLAIM_LEDGER.md, section R4. The order is fixed in `data/plans/R4_order.json
 first request, and the runner follows it with `--plan`. The run stops at a budget cap or a
 time limit (`--stop-at`), whichever comes first, so the report can be finished before the
 deadline.
+
+## D24. Public AI's `apertus-v1.5-8b` id appears to serve the 70B. No 8B result is reported.
+
+R2 called `swiss-ai/apertus-v1.5-8b` on Public AI and was billed at the 8B price. LiteLLM
+routes that id to `openai/alias-apertus` on Jülich's Blablador
+(`x-litellm-model-name: openai/alias-apertus`), which is an alias, not a pinned checkpoint. At
+temperature 0 its answers match the official 70B word for word:
+
+- R2 against R1 (official `swiss-ai/Apertus-v1.5-70B` on Featherless): identical text on 91.9%
+  of 6,716 items, and 1,356 of 1,361 F1 answers.
+- R2 against R1's Public AI 70B route: identical on 92.3% of 287 items.
+- The two 70B deployers agree with each other at the same rate, 92.3%.
+
+An 8B and a 70B model do not write the same 46-token French summary nine times in ten. The
+data says this route served the 70B, or a model indistinguishable from it on this benchmark.
+R3 used the same route with thinking switched on, and its first answers match R4 (70B thinking
+on Featherless) word for word too.
+
+Consequences:
+
+- No result in this submission is reported as the 8B. Runs are labelled by the route that was
+  called: "Public AI '8B' route", and the same route with thinking.
+- The PRD's 8B versus 70B comparison is not possible with the hosted endpoints available on
+  15 and 16 October. No HF Inference Provider serves `swiss-ai/Apertus-v1.5-8B`.
+- The intended check, a local replay of the official 8B weights (D12), would settle it. It
+  needs the gated licence accepted on the author's Hugging Face account.
+- The ~92% agreement between routes is itself a measurement: the same weights served by
+  different stacks at temperature 0 give a different F1 outcome on about 1 answer in 12.
