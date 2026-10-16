@@ -1,60 +1,61 @@
-# Hack Apertus — project template
+# Scrutineer
 
-Template repository for [Hack Apertus](https://hackapertus.ch/) submissions.
-Every project keeps almost the same layout, so organizers and judges find the
-same things in the same place.
+**Does Apertus know what the Swiss people decided?** Scrutineer asks Apertus 1.5 about every
+Swiss federal popular vote since 1990: 334 decided votes plus 4 not yet held, 6,716 questions
+in German, French, Italian, English and Romansh, with gold answers from Swissvotes
+(Universität Bern) and the Federal Chancellery's official vote titles.
 
-## Select your track
+Hack Apertus 2026, Track 1B Swiss Voices (core task intelligence). The project lives in
+[`track_1b/`](track_1b/).
 
-This repository holds one example project per track:
+| | |
+|---|---|
+| Live site and vote explorer | https://winsznx.github.io/scrutineer/ |
+| Report (PDF, 4 pages) | [`track_1b/Scrutineer_Report.pdf`](track_1b/Scrutineer_Report.pdf) |
+| Dataset (items, responses, metadata) | https://huggingface.co/datasets/winsznx/scrutineer |
+| Full README, quickstart, results | [`track_1b/README.md`](track_1b/README.md) |
 
-- `track_1a/`
-- `track_1b/`
-- `track_2a/`
-- `track_2b/`
+## What we found
 
-Keep the directory for the track you are competing in **exactly as it is** —
-don't rename it or move its files — and delete the other track directories.
-That directory is your project root. Keep the files and directories as shown
-below.
+- The pre-registered claim, that Apertus repeats the government's line on votes the
+  government lost, **failed**: the gap is 8.8 points, under the 10-point falsifier.
+- The real pattern is a **default answer of "rejected"**, and how strong it is depends on the
+  language: about 95% "rejected" when asked in French or English, close to the true rate in
+  German.
+- **Reasoning works, recall fails**: given the yes share and cantonal votes the model is right
+  95.5% of the time on votes the government lost, and 30.3% when asked to remember.
+- **Serving matters**: the same official 70B weights on two providers differ on 7.7% of
+  answers at temperature 0, and Public AI's 8B endpoint answers like the 70B, so no 8B result
+  is reported.
 
-## The structure
+![Share of answers saying "accepted", by question language](track_1b/docs/figures/fig5_language_bias.png)
 
-| Path | What it is |
-| --- | --- |
-| `README.md` | The challenge description and submission requirements for your track |
-| `technical_report.md` | The deeper write-up: architecture, evaluation, limitations |
-| `Makefile` | `make run` must spin up your project |
-| `src/` | Your code |
-| `data/` | Datasets — `track_1a`, `track_2a` and `track_2b` only; max. 100 MB |
-| `findings/` | Issue files — `track_1a` only |
-| `docs/` | Diagrams, notes, longer write-ups |
-
-## Run it
-
-Judges run `make run` from the root of the project, on a clean checkout:
+## Reproduce
 
 ```bash
-make run
+git clone https://github.com/winsznx/scrutineer && cd scrutineer/track_1b
+make run    # Docker, under a minute after the image build, no API key
 ```
 
-`make run` is expected to run the project using Docker, since that
-is how the judges will run it.
-- If you used other local open-weight models, include instructions for running the project in your technical report.
-- Use the following environment variables:
-```
-LLM_NAME — name and version of the model
-LLM_BASE_URL — endpoint base URL
-LLM_API_KEY — your API key
-```
+`make run` rebuilds all 6,716 items from the pinned sources, replays grading from the stored
+responses and judge verdicts, checks `results.json` against its recorded hash and every number
+quoted in the docs, and rebuilds the site. It exits non-zero on any mismatch.
 
-## Getting started
+## Where things are
 
-1. Click **Use this template** to create your own repository.
-2. Delete the other track directories. Don't rename or restructure yours.
-3. Read its `README.md` and fill in `technical_report.md`.
-4. Make `make run` work from the root of the project, on a clean checkout.
+| Path | What |
+|---|---|
+| `track_1b/technical_report.md` | the report source |
+| `track_1b/docs/CLAIM_LEDGER.md` | the claim, registered before the first model request, and its status |
+| `track_1b/docs/DECISIONS.md` | every departure from the plan (D1 to D26) |
+| `track_1b/docs/DATA_CARD.md` | the dataset card |
+| `track_1b/data/` | items, responses, judge verdicts, human check, `results.json` |
+| `track_1b/src/scrutineer/` | the package: build, run, grade, report, site |
 
 ## License
 
-All Hack Apertus projects are open-sourced. Please check our Terms & Conditions for specific licensing details (6. What you build is open source): https://hackapertus.ch/terms-and-conditions
+Code Apache-2.0 ([LICENSE](LICENSE)). Dataset CDLA-Permissive-2.0. Report CC-BY-4.0. Source
+data: Swissvotes (Année Politique Suisse, Universität Bern, CC BY 4.0) and the Swiss Federal
+Chancellery.
+
+Built from the [Hack Apertus project template](https://github.com/HackApertus/project-template).
