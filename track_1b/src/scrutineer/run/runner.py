@@ -110,7 +110,7 @@ class RunState:
     done: set[str] = field(default_factory=set)
     failed: set[str] = field(default_factory=set)
     stop_reason: str | None = None
-    stop_kind: str | None = None  # "budget", "endpoint" or "signal"
+    stop_kind: str | None = None  # "budget", "endpoint", "signal" or "deadline"
     consecutive_failures: int = 0
 
 
@@ -209,7 +209,9 @@ class Runner:
         out_path: Path,
         transport: httpx.AsyncBaseTransport | None = None,
         sleep_base_s: float = 2.0,
+        stop_at: datetime | None = None,
     ) -> None:
+        self.stop_at = stop_at
         self.config = config
         self.guard = guard
         self.out_path = out_path
@@ -357,6 +359,12 @@ class Runner:
 
         async def worker(client: httpx.AsyncClient) -> None:
             while not stop.is_set():
+                if self.stop_at is not None and datetime.now(UTC) >= self.stop_at:
+                    if self.state.stop_reason is None:
+                        self.state.stop_reason = f"time limit {self.stop_at.isoformat()} reached"
+                        self.state.stop_kind = "deadline"
+                    stop.set()
+                    return
                 try:
                     item = queue.get_nowait()
                 except asyncio.QueueEmpty:

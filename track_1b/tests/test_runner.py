@@ -209,3 +209,16 @@ def test_malformed_200_body_is_retried(tmp_path: Path) -> None:
     record = read_records(tmp_path / "T.jsonl")["400-F1-de"]
     assert record["status"] == "ok"
     assert record["attempts"] == 2
+
+
+def test_stop_at_in_the_past_sends_nothing(tmp_path: Path) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    server = FakeServer()
+    config = RunConfig(run_id="T", model="m", provider=PROVIDER, price=(1.0, 1.0), workers=2, rpm=60_000)
+    guard = BudgetGuard(SpendLedger(tmp_path / "ledger.jsonl"), credit_usd=2.0)
+    runner = Runner(config, guard, tmp_path / "T.jsonl", httpx.MockTransport(server), sleep_base_s=0,
+                    stop_at=datetime.now(UTC) - timedelta(seconds=1))
+    asyncio.run(runner.run(make_items(5)))
+    assert server.calls == []
+    assert runner.state.stop_kind == "deadline"

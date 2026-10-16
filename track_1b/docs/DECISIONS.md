@@ -256,3 +256,10 @@ grading change. The 1.0.0 verdicts are kept unedited in `data/judgements/v1.0/`,
 report gives the headline numbers under both versions. The bug was found using the
 human-labelled rows, so judge-human agreement on those rows is optimistic for 1.1.0, and the
 report says so.
+
+## D23. R4 is a pre-registered stratified sample
+
+See CLAIM_LEDGER.md, section R4. The order is fixed in `data/plans/R4_order.jsonl` before the
+first request, and the runner follows it with `--plan`. The run stops at a budget cap or a
+time limit (`--stop-at`), whichever comes first, so the report can be finished before the
+deadline.

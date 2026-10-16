@@ -9,6 +9,7 @@ import json
 import os
 import sys
 from collections.abc import Callable
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,7 @@ EXIT_REMAINING = 3
 EXIT_BUDGET = 4
 EXIT_ENDPOINT_DOWN = 5
 EXIT_SIGNAL = 130
+EXIT_DEADLINE = 6
 
 
 def cmd_fetch_titles(args: argparse.Namespace, paths: Paths) -> int:
@@ -138,7 +140,14 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     extra_meta = {"items_path": str(items_path.relative_to(paths.root))} if args.items else {}
     write_meta(paths.responses / f"{args.run_id}.meta.json", config, items_sha, extra_meta)
 
-    selected = order_items(_select(_load_items(items_path), args))
+    selected = _select(_load_items(items_path), args)
+    if args.plan:
+        from scrutineer.run.sampling import read_plan
+
+        rank = {item_id: i for i, item_id in enumerate(read_plan(Path(args.plan)))}
+        selected = sorted((i for i in selected if i["item_id"] in rank), key=lambda i: rank[i["item_id"]])
+    else:
+        selected = order_items(selected)
     if args.limit:
         selected = selected[: args.limit]
     todo = pending_items(selected, read_records(out), args.retry_failed)
@@ -149,7 +158,8 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     print(f"{args.run_id}: {len(selected)} selected, {len(todo)} to send, "
           f"ledger spend ${ledger.total_usd:.4f}, est. remaining ${guard.remaining_usd:.4f}")
 
-    state = asyncio.run(Runner(config, guard, out).run(todo))
+    stop_at = datetime.fromisoformat(args.stop_at) if args.stop_at else None
+    state = asyncio.run(Runner(config, guard, out, stop_at=stop_at).run(todo))
 
     if provider.billing_url and provider.api_key:
         try:
@@ -169,7 +179,8 @@ def cmd_run(args: argparse.Namespace, paths: Paths) -> int:
     report_remaining(remaining, paths.responses / f"{args.run_id}.remaining.txt")
     if not remaining:
         return 0
-    return {"budget": EXIT_BUDGET, "endpoint": EXIT_ENDPOINT_DOWN, "signal": EXIT_SIGNAL}.get(
+    return {"budget": EXIT_BUDGET, "endpoint": EXIT_ENDPOINT_DOWN, "signal": EXIT_SIGNAL,
+            "deadline": EXIT_DEADLINE}.get(
         state.stop_kind or "", EXIT_REMAINING)
 
 
@@ -303,6 +314,19 @@ def cmd_merge_prelabels(args: argparse.Namespace, paths: Paths) -> int:
     return 0
 
 
+def cmd_plan(args: argparse.Namespace, paths: Paths) -> int:
+    import collections
+
+    from scrutineer.run.sampling import stratified_order, write_plan
+
+    plan = stratified_order(_load_items(paths.items), args.seed)
+    out = Path(args.out)
+    write_plan(plan, out)
+    counts = collections.Counter(phase for _, phase in plan)
+    print(f"wrote {len(plan)} ranked items to {out}: {dict(counts)}")
+    return 0
+
+
 def cmd_label(args: argparse.Namespace, paths: Paths) -> int:
     from scrutineer.grade.labeller import serve
 
@@ -376,6 +400,8 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--families", help="comma separated, e.g. F1,F7")
     run.add_argument("--langs", help="comma separated, e.g. de,fr")
     run.add_argument("--item-ids", help="file with item ids to restrict to")
+    run.add_argument("--stop-at", help="ISO time with offset; no new requests after it, e.g. 2026-10-16T07:30+00:00")
+    run.add_argument("--plan", help="pre-registered order file (scrutineer plan); overrides family priority")
     run.add_argument("--items", help="alternative item file, e.g. data/robustness/order_swap_items.jsonl")
     run.add_argument("--limit", type=int, help="first N items in priority order")
     run.add_argument("--retry-failed", action="store_true")
@@ -414,6 +440,9 @@ def build_parser() -> argparse.ArgumentParser:
     contamination.add_argument("--skip-corpus", action="store_true", help="domain check only")
 
     sub.add_parser("merge-prelabels", help="add Claude pre-labels to the hand-check sheet and export the review sheet")
+    plan = sub.add_parser("plan", help="write the pre-registered stratified item order for a budget-limited run")
+    plan.add_argument("--out", required=True)
+    plan.add_argument("--seed", type=int, default=20261016)
     label = sub.add_parser("label", help="local keyboard-driven page for the human check")
     label.add_argument("--port", type=int, default=8766)
     sub.add_parser("site", help="build the static site into site/")
@@ -440,6 +469,7 @@ HANDLERS: dict[str, Handler] = {
     "contamination": cmd_contamination,
     "site": cmd_site,
     "label": cmd_label,
+    "plan": cmd_plan,
     "merge-prelabels": cmd_merge_prelabels,
     "export-hf": cmd_export_hf,
     "replay": cmd_replay,
