@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-JUDGE_PROMPT_VERSION = "1.0.0"
+JUDGE_PROMPT_VERSION = "1.1.0"
 JUDGE_MODEL = "Qwen/Qwen2.5-7B-Instruct (GGUF Q8_0, Qwen/Qwen2.5-7B-Instruct-GGUF)"
 GRADES = ("correct", "incorrect", "not_attempted")
 
@@ -30,6 +30,12 @@ Return exactly one grade:
 - "correct": the response gives the gold answer and contains nothing that contradicts the gold facts. Extra true detail, hedging words or a different language are fine.
 - "incorrect": the response gives an answer that differs from the gold answer, or it states any detail that contradicts the gold facts (outcome, Federal Council recommendation, or a yes share more than 2 percentage points from the gold yes share). A hedged but wrong answer is incorrect.
 - "not_attempted": the response does not commit to an answer (it says it does not know, refuses, or only restates the question) and states nothing that contradicts the gold facts.
+
+How to read "majority" (added in prompt version 1.1.0):
+- "Rejected by a majority", "a majority of voters opposed it", "mit deutlicher Mehrheit abgelehnt", "rejeté à une large majorité" describe the winning side. For a REJECTED proposal they mean most voters voted no, which agrees with any yes share under 50%. They are not a contradiction.
+- "Accepted by a majority" likewise agrees with any yes share over 50%.
+- A "clear", "large", "wide" or "overwhelming" majority does contradict the gold when the gold yes share is within 2 percentage points of 50%.
+- A percentage given as the size of the winning majority ("rejected with 52.3% of the votes") is the no share for a rejected proposal; compare 100 minus it with the gold yes share.
 
 Grade only against the gold facts given. Do not use your own knowledge of the vote. Reply with JSON only."""
 
@@ -82,8 +88,12 @@ def describe_gold(item: dict[str, Any]) -> str:
         return (f"Written into the Federal Constitution after the vote: {verdict}. The proposal "
                 f"was {OUTCOME_WORDS[gold['outcome']]} in the vote.")
     if family == "F8":
+        yes = gold["yes_share"]
+        side = "most voters voted YES" if yes > 50 else "most voters voted NO"
+        close = " The vote was close (within 2 points of 50%)." if abs(yes - 50) <= 2 else ""
         return (f"Outcome: {OUTCOME_WORDS[gold['outcome']]}. The Federal Council "
-                f"{FC_WORDS[gold['fc_position']]}. Yes share: {gold['yes_share']:.2f}%. "
+                f"{FC_WORDS[gold['fc_position']]}. Yes share: {yes:.2f}%. No share: {100 - yes:.2f}%, "
+                f"so {side}.{close} "
                 "A correct one-sentence summary must state the outcome correctly and must not "
                 "contradict the other facts if it mentions them.")
     raise ValueError(f"no gold description for family {family}")

@@ -234,3 +234,25 @@ truncated JSON body. The runner did not catch the parse error, the run exited, a
 supervisor treated the exit as fatal, so R1 sat idle until it was noticed at 02:20 UTC on
 16 October. The runner now treats a malformed 200 as a transient fault and retries it, with
 a test. No response was lost or fabricated: the failed request was never recorded.
+
+## D22. Judge prompt 1.1.0: fixes "majority" misreading, all runs re-judged
+
+The human check showed a systematic judge error. On 31 of the 34 rows where the judge
+disagreed with the second rater, it had marked F8 answers such as "rejected, with a majority
+of voters opposing" or "mit deutlicher Mehrheit abgelehnt" incorrect, reading "majority" as
+a majority voting yes. The human sided against the judge on all 34. Version 1.1.0 changes
+two things:
+
+1. The F8 gold statement now spells out the derived facts: the no share, which side won
+   ("most voters voted NO"), and whether the vote was within 2 points of 50%.
+2. The system prompt has four rules for reading "majority" phrasing.
+
+On 18 check cases (the 8 original sanity cases and 10 of the 34 disagreements) version 1.0
+gets 8, 1.1.0 with the rules alone gets 12, and the final 1.1.0 gets 15. Iteration stopped there, to
+avoid fitting the judge to the labelled sample.
+
+Every judged item in every run was re-judged with 1.1.0, as PRD section 8 requires for a
+grading change. The 1.0.0 verdicts are kept unedited in `data/judgements/v1.0/`, and the
+report gives the headline numbers under both versions. The bug was found using the
+human-labelled rows, so judge-human agreement on those rows is optimistic for 1.1.0, and the
+report says so.
