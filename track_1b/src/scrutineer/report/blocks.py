@@ -216,6 +216,19 @@ def deployer_text(results: Results) -> str:
             f"answer {pct(d['parsed_agreement'])} of the time. The rest flip between accepted and rejected.\n")
 
 
+def route_identity_text(results: Results) -> str:
+    ri = results.get("route_identity", {})
+    pairs = {
+        "R1~R2": "the official 70B (Featherless) and Public AI's \"8B\" route",
+        "R1~R1_publicai": "the official 70B on Featherless and on Public AI",
+        "R1_publicai~R2": "Public AI's 70B and \"8B\" routes",
+        "R3~R4": "Public AI's \"8B\" route with thinking and the 70B with thinking (Featherless)",
+    }
+    lines = [f"- {label}: identical text on {pct(ri[key]['identical_text'])} of {ri[key]['n']:,} items"
+             for key, label in pairs.items() if key in ri]
+    return "\n".join(lines) + "\n" if lines else "_No route comparison available._\n"
+
+
 def r4_table(results: Results) -> str:
     pr = results.get("r4_vs_r1")
     if not pr:
@@ -319,6 +332,7 @@ BLOCKS: dict[str, Callable[[Results], str]] = {
     "thinking_table": thinking_table,
     "deployer_text": deployer_text,
     "r4_table": r4_table,
+    "route_identity_text": route_identity_text,
 }
 
 

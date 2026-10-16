@@ -25,6 +25,7 @@ Apertus. It is never Apertus. It runs locally on llama.cpp, with no paid API.
 | Revision and sha256 | recorded in `docs/judge_meta.json` by `scripts/judge_server.sh` |
 | Runtime | llama.cpp `llama-server` (version in `docs/judge_meta.json`), Metal on an M1 Pro |
 | Sampling | temperature 0, seed 0, `max_tokens` 120 |
+| Serving | `llama-server`, 4 parallel slots, 16,384-token context shared across slots (judge 1.0.0 verdicts used 2 slots) |
 | Output | constrained by a JSON schema: `{"grade": correct\|incorrect\|not_attempted, "reason": ...}` |
 
 Q8_0 was chosen as the closest quantisation to the full-precision weights that fits on the

@@ -54,4 +54,4 @@ PY
 fi
 
 exec llama-server -m "$dir/${shards[0]}" --host 127.0.0.1 --port "${JUDGE_PORT:-8080}" \
-  --ctx-size 8192 --parallel 2 --n-gpu-layers 99 --seed 0 --alias judge
+  --ctx-size 16384 --parallel "${JUDGE_PARALLEL:-4}" --n-gpu-layers 99 --seed 0 --alias judge
