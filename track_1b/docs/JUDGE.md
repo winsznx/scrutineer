@@ -72,6 +72,14 @@ language. `scrutineer merge-prelabels` adds those labels to `human_check.csv` an
 `human_check_review.csv` for the human pass. Because the human saw Claude's label, judge vs
 human is not independent of Claude, and the report says so next to the number.
 
+How the human labels were produced: the labeller (Tim) received the sample with Claude's
+pre-labels and submitted grades for all 311 rows as one batch on 2026-10-16 at 02:15 UTC,
+which is the `labelled_at` value on every row. Per-row label times were not captured. The
+human grades equal Claude's pre-labels on 309 of 311 rows. On a second pass the labeller
+overrode two (`72ecd4ed12`, `07da9f6900`): both answers claim a "clear majority" for votes
+decided at 50.08% and 49.77% yes. Read judge vs human as judge vs Claude with a light human
+review on top, not as an independent second annotation.
+
 <!-- scrutineer:begin judge_table -->
 | Run | Judged items | By reason | F6 parser vs judge agreement |
 |---|--:|---|--:|
