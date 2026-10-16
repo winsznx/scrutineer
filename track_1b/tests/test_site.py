@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -17,7 +18,11 @@ REAL_DATA = ROOT / "data"
 VOTE_KEYS = {"a", "d", "t", "g", "i", "e", "m", "s", "pc", "o", "f", "y", "cy", "cn", "ic", "u", "k", "v"}
 BANNED = ("\u2014", "!", "robust", "seamless", "groundbreaking", "delve", "crucial", "pivotal")
 HEADLINE_SPAN = re.compile(r'<span data-headline="(?P<key>[a-z_]+)">(?P<text>[^<]*)</span>')
-RESULT_SPAN = re.compile(r'<span data-result="(?P<path>[A-Za-z0-9_.]+)">(?P<text>[^<]*)</span>')
+RESULT_SPAN = re.compile(r'<span data-result="(?P<path>[A-Za-z0-9_.~]+)">(?P<text>[^<]*)</span>')
+DERIVED_SPAN = re.compile(
+    r'<span data-derived="(?P<op>[a-z_]+)" data-path="(?P<path>[A-Za-z0-9_.~]+)">(?P<text>[^<]*)</span>')
+RUN_LABELS = ('70B (Featherless)', 'Public AI "8B" route', 'Public AI "8B" route, thinking',
+              '70B thinking (Featherless)')
 
 
 VOID_TAGS = frozenset({"meta", "link", "br", "img", "input", "hr", "source", "wbr"})
@@ -114,6 +119,85 @@ def test_language_section_numbers_match_results(real_site: Path) -> None:
     assert 'class="truth"' in section and "bar-lost" not in section
 
 
+def _resolve(results: dict[str, Any], path: str) -> Any:
+    value: Any = results
+    for key in path.split("."):
+        value = value[key]
+    return value
+
+
+def _section(html: str, section_id: str) -> str:
+    return html.partition(f'id="{section_id}"')[2].partition("</section>")[0]
+
+
+def _text(html: str) -> str:
+    return unescape(re.sub(r"<[^>]+>", " ", html))
+
+
+def test_every_tagged_number_matches_results(real_site: Path) -> None:
+    results = json.loads((REAL_DATA / "results.json").read_text())
+    html = (real_site / "index.html").read_text()
+    for match in RESULT_SPAN.finditer(html):
+        value = _resolve(results, unescape(match["path"]))
+        assert _shown_matches(match["text"], value), (match["path"], match["text"], value)
+    derived = list(DERIVED_SPAN.finditer(html))
+    for match in derived:
+        value = _resolve(results, unescape(match["path"]))
+        if match["op"] == "complement":
+            assert _shown_matches(match["text"], 1 - value), match["path"]
+        elif match["op"] == "one_in":
+            assert int(match["text"]) == round(1 / (1 - value)), match["path"]
+        else:
+            assert match["op"] == "agreed"
+            assert int(match["text"].replace(",", "")) == round(value["n"] * value["raw_agreement"]), match["path"]
+    if results.get("route_identity", {}).get("R1~R1_publicai"):
+        assert {m["op"] for m in derived} >= {"complement", "one_in"}
+    if results.get("second_rater_agreement", {}).get("claude_vs_human", {}).get("all"):
+        assert "agreed" in {m["op"] for m in derived}
+
+
+def test_headline_states_claim_and_instrument_split(real_site: Path) -> None:
+    results = json.loads((REAL_DATA / "results.json").read_text())
+    html = (real_site / "index.html").read_text()
+    finding = _section(html, "finding")
+    status = results.get("claims", {}).get("C1")
+    if status == "FAILED" and results["results"]["R1"]["headline"]["gap_points"] < 10:
+        assert "failed: the gap is under the 10-point falsifier." in _text(finding)
+    within = results["results"]["R1"].get("within_instrument")
+    if not within:
+        pytest.skip("no within_instrument in results.json yet")
+    paths = {m["path"] for m in RESULT_SPAN.finditer(finding)}
+    for instrument in ("initiative", "referendum_or_counterproposal"):
+        for stratum in ("won", "lost"):
+            assert f"results.R1.within_instrument.{instrument}.accuracy_gov_{stratum}" in paths
+    assert html.index('id="finding"') < html.index('id="languages"') < html.index('id="serving"')
+
+
+def test_serving_section_reports_every_route_pair(real_site: Path) -> None:
+    results = json.loads((REAL_DATA / "results.json").read_text())
+    html = (real_site / "index.html").read_text()
+    section = _section(html, "serving")
+    assert "Same weights, different answers" in section
+    assert "#d24-public-ais-apertus-v15-8b-id-appears-to-serve-the-70b-no-8b-result-is-reported" in section
+    paths = {m["path"] for m in RESULT_SPAN.finditer(section)}
+    for pair in ("R1~R2", "R1~R1_publicai", "R1_publicai~R2", "R3~R4"):
+        if pair in results.get("route_identity", {}):
+            assert {f"route_identity.{pair}.identical_text", f"route_identity.{pair}.n"} <= paths, pair
+    caveats = _text(_section(html, "caveats"))
+    assert "Serving" in caveats and "Human check" in caveats
+    assert "labelled blind by a person" not in caveats
+
+
+def test_no_run_is_called_8b_outside_its_label(real_site: Path) -> None:
+    labels = sorted(RUN_LABELS, key=len, reverse=True)
+    for name in ("index.html", "explorer.html"):
+        html = re.sub(r"<code>[^<]*</code>", " ", (real_site / name).read_text())
+        text = _text(html)
+        for label in labels:
+            text = text.replace(label, " ")
+        assert text.count("8B") == text.count("no 8B result is reported"), name
+
+
 def test_one_vote_entry_per_vote(real_site: Path) -> None:
     items = [json.loads(line) for line in (REAL_DATA / "items.jsonl").read_text().splitlines() if line]
     expected = {i["anr"] for i in items if i["family"] in {"F1", "F7"}}
@@ -175,6 +259,9 @@ def test_partial_data_renders_without_crashing(tmp_path: Path) -> None:
     assert '<span data-headline="gap_points">n/a</span>' in index
     assert "accepted on 3 March 2024" in index
     assert "Not yet run." not in index and "is still running" in index
+    assert "The routes have not been compared yet." in index
+    assert "have not been compared yet" in index.partition('id="caveats"')[2]
+    assert "against human labels has not been done yet" in index
     _assert_well_formed(index)
     _assert_well_formed((site / "explorer.html").read_text())
     payload = json.loads((site / "data" / "votes.json").read_text())

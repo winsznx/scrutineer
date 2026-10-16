@@ -34,6 +34,9 @@ DATASET_URL = "https://huggingface.co/datasets/winsznx/scrutineer"
 REPORT_URL = f"{REPO_URL}/blob/main/track_1b/Scrutineer_Report.pdf"
 CONTAMINATION_URL = f"{REPO_URL}/blob/main/track_1b/docs/CONTAMINATION.md"
 LEDGER_URL = f"{REPO_URL}/blob/main/track_1b/docs/CLAIM_LEDGER.md"
+JUDGE_URL = f"{REPO_URL}/blob/main/track_1b/docs/JUDGE.md"
+D24_URL = (f"{REPO_URL}/blob/main/track_1b/docs/DECISIONS.md"
+           "#d24-public-ais-apertus-v15-8b-id-appears-to-serve-the-70b-no-8b-result-is-reported")
 TEMPLATES_URL = f"{REPO_URL}/tree/main/track_1b/src/scrutineer/templates"
 SWISSVOTES_URL = "https://swissvotes.ch"
 FONTS_URL = ("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500"
@@ -42,6 +45,10 @@ AHV_TITLE = re.compile(r"\b13\.?\s*AHV")
 TAGLINE = ("A benchmark that asks Apertus 1.5 what the Swiss people decided in every federal vote since 1990, "
            "in four languages, and shows where and why it gets them wrong.")
 ERAS = ("1990s", "2000s", "2010s", "2020s")
+ROUTE_PAIRS = ("R1~R2", "R1~R1_publicai", "R1_publicai~R2", "R3~R4")
+DEPLOYER_PAIR = "R1~R1_publicai"
+# R1_publicai holds the 287 answers Public AI's 70B gave before R1 moved to Featherless (D19). It is not a run.
+ROUTE_NAMES = {"R1_publicai": "70B (Public AI)"}
 _CURRENT = ' aria-current="page"'
 
 
@@ -107,8 +114,51 @@ Official titles: Federal Chancellery, via LINDAS.</p>
 
 
 def _claim_status(results: dict[str, Any]) -> str:
-    status = dig(results, "results", CLAIM_RUN, "headline", "status") or dig(results, "claims", "C1") or "pending"
+    status = dig(results, "claims", "C1") or dig(results, "results", CLAIM_RUN, "headline", "status") or "pending"
     return str(status).lower()
+
+
+def _claim(results: dict[str, Any], head: dict[str, Any]) -> str:
+    claim = _link(LEDGER_URL, "pre-registered claim")
+    status = _claim_status(results)
+    if status == "failed":
+        gap, share = number(head.get("gap_points")), number(head.get("directional_share"))
+        reasons = [reason for failed, reason in (
+            (gap is not None and gap < 10, "the gap is under the 10-point falsifier"),
+            (share is not None and share < 0.5,
+             "fewer than half of the misses on votes the government lost match its recommendation"),
+        ) if failed]
+        why = f": {' and '.join(reasons)}" if reasons else ""
+        return f"The {claim} failed{why}. It predicted at least 20 points."
+    if status == "supported":
+        return f"The {claim} held: the gap is at least the 20 points it predicted."
+    if status == "inconclusive":
+        return f"The {claim} is inconclusive: the result is between the 10-point falsifier and the predicted 20."
+    return f"The {claim} is not decided yet. It predicts a gap of at least 20 points and fails below 10."
+
+
+def _within_instrument(results: dict[str, Any]) -> str:
+    within = dig(results, "results", CLAIM_RUN, "within_instrument")
+    if not within:
+        return ""
+    base = f"results.{CLAIM_RUN}.within_instrument"
+    ref = "referendum_or_counterproposal"
+
+    def acc(instrument: str, stratum: str) -> str:
+        key = f"accuracy_gov_{stratum}"
+        return _result(f"{base}.{instrument}.{key}", pct(dig(within, instrument, key)))
+
+    label = esc(run_label(results, CLAIM_RUN))
+    text = (f"On initiatives the government lost, {label} is right {acc('initiative', 'lost')} of the time, "
+            f"against {acc('initiative', 'won')} on initiatives it won. On referendums and counter-proposals the "
+            f"government lost it is right {acc(ref, 'lost')}, against {acc(ref, 'won')} when the government won.")
+    init_lost, init_won, ref_lost, ref_won = (number(dig(within, instrument, f"accuracy_gov_{stratum}"))
+                                              for instrument in ("initiative", ref) for stratum in ("lost", "won"))
+    if (init_lost is not None and init_won is not None and ref_lost is not None and ref_won is not None
+            and init_lost < init_won and ref_lost > ref_won):
+        text += (" A model repeating the government would fail both. Apertus fails the first and does better on "
+                 "the second, which fits a default answer of \"rejected\".")
+    return text
 
 
 def _headline(data: SiteData) -> str:
@@ -131,8 +181,7 @@ def _headline(data: SiteData) -> str:
               f"the government won, {span('n_gov_lost', count(head.get('n_gov_lost')))} on votes it lost. "
               f"Two-proportion test: z = {span('z', fixed(head.get('z'), 2))}, "
               f"p = {span('p_value', fixed(head.get('p_value'), 2))}.")
-    claim = (f"The {_link(LEDGER_URL, 'pre-registered claim')} expected a gap of at least 20 points and counts as "
-             f"failed below 10. Status: {esc(_claim_status(results))}.")
+    within = _within_instrument(results)
     answered = number(dig(results, "runs", CLAIM_RUN, "coverage", "F1", "answered"))
     total = number(dig(results, "runs", CLAIM_RUN, "coverage", "F1", "items"))
     progress = ""
@@ -142,7 +191,9 @@ def _headline(data: SiteData) -> str:
     if not head:
         return f'<p class="big">{big}</p><p class="headline-text">{esc(label)}: not yet run.</p>'
     return (f'<p class="big">{big}{unit}</p><p class="headline-text">{accuracies}</p>'
-            f'<p class="detail">{detail} {claim}</p>{progress}')
+            f'<p class="claim">{_claim(results, head)}</p>'
+            + (f'<p class="claim-detail">{within}</p>' if within else "")
+            + f'<p class="detail">{detail}</p>{progress}')
 
 
 def _answer_phrase(answer: list[Any] | None) -> str:
@@ -202,6 +253,11 @@ Federal Council lost.</figcaption>
 def _result(path: str, text: str) -> str:
     """A number on the page, tagged with the results.json path it was read from."""
     return f'<span data-result="{esc(path)}">{esc(text)}</span>'
+
+
+def _derived(op: str, path: str, text: str) -> str:
+    """A number computed from a results.json value, tagged with the operation and the path it starts from."""
+    return f'<span data-derived="{esc(op)}" data-path="{esc(path)}">{esc(text)}</span>'
 
 
 def _bias_runs(data: SiteData) -> list[str]:
@@ -295,6 +351,34 @@ accepted, from the {esc(run_label(data.results, truth_run))} run, which has answ
 """
 
 
+def _route_name(results: dict[str, Any], route: str) -> str:
+    return ROUTE_NAMES.get(route) or run_label(results, route)
+
+
+def _route_sentence(results: dict[str, Any], pair: str, entry: dict[str, Any]) -> str:
+    first, _, second = pair.partition("~")
+    path = f"route_identity.{pair}"
+    return (f"{esc(_route_name(results, first))} and {esc(_route_name(results, second))} give word-for-word "
+            f"identical answers on {_result(f'{path}.identical_text', pct(entry.get('identical_text')))} of "
+            f"{_result(f'{path}.n', count(entry.get('n')))} items.")
+
+
+def _serving(data: SiteData) -> str:
+    identity = dig(data.results, "route_identity") or {}
+    pairs = [pair for pair in ROUTE_PAIRS if isinstance(identity.get(pair), dict)]
+    sentences = [_route_sentence(data.results, pair, identity[pair]) for pair in pairs]
+    if not sentences:
+        sentences = ["The routes have not been compared yet."]
+    body = "".join(f"<p>{sentence}</p>" for sentence in sentences)
+    d24 = ("Public AI's <code>apertus-v1.5-8b</code> id answers like the 70B, so no 8B result is reported. "
+           f"{_link(D24_URL, 'Decision D24')} has the evidence.")
+    return f"""<section class="serving wrap grid" id="serving" aria-labelledby="serving-h">
+<h2 class="section-title" id="serving-h">Same weights, different answers</h2>
+<div class="prose">{body}<p>{d24}</p></div>
+</section>
+"""
+
+
 def _method(data: SiteData) -> str:
     results = data.results
     items = count(dig(results, "items", "count"))
@@ -380,22 +464,67 @@ def _hosted(results: dict[str, Any]) -> str:
     return esc(text)
 
 
+def _serving_noise(results: dict[str, Any]) -> str:
+    path = f"route_identity.{DEPLOYER_PAIR}"
+    entry = dig(results, "route_identity", DEPLOYER_PAIR) or {}
+    same = number(entry.get("identical_text"))
+    if same is None:
+        return esc("The two deployers of the official 70B have not been compared yet.")
+    differ = 1 - same
+    share = _derived("complement", f"{path}.identical_text", pct(differ))
+    rate = (f", about 1 in {_derived('one_in', f'{path}.identical_text', str(round(1 / differ)))}"
+            if differ > 0 else "")
+    first, _, second = DEPLOYER_PAIR.partition("~")
+    return (f"The same weights at temperature 0 give a different answer on {share} of items{rate}, depending on "
+            f"who serves them. That is {esc(_route_name(results, first))} against "
+            f"{esc(_route_name(results, second))} on the {_result(f'{path}.n', count(entry.get('n')))} items both "
+            "answered. A single run of a hosted Apertus carries that much serving noise.")
+
+
 def _judge(results: dict[str, Any]) -> str:
+    judged = count(dig(results, "judge", CLAIM_RUN, "judged_items"))
+    return esc(f"Answers the parser cannot read are graded by a 7B judge model, which can be wrong. In run "
+               f"{CLAIM_RUN} it decided {judged} answers.")
+
+
+def _judge_vs_human(human: dict[str, Any]) -> str:
+    version = str(human.get("judge_prompt_version") or "")
+    current = dig(human, "by_lang", "all")
+    earlier = dig(human, "judge_v1_0_by_lang", "all")
+    path, entry = (("human_check.by_lang.all", current) if current
+                   else ("human_check.judge_v1_0_by_lang.all", earlier) if earlier else ("", None))
+    if entry is None:
+        return ""
+    shown, verb = (esc(version), "agrees") if current and version else ("1.0.0", "agreed")
+    text = (f" Judge prompt {shown} {verb} with the reviewed labels on "
+            f"{_result(f'{path}.raw_agreement', pct(entry.get('raw_agreement')))} of them, Cohen's kappa "
+            f"{_result(f'{path}.cohen_kappa', fixed(entry.get('cohen_kappa'), 2))}.")
+    if current and version != "1.0.0":
+        text += " That prompt was corrected using these rows, so the number is optimistic."
+    elif version and version != "1.0.0":
+        text += f" Re-judging the sample with prompt {esc(version)} is not finished."
+    return text
+
+
+def _human_check(results: dict[str, Any]) -> str:
     human = dig(results, "human_check") or {}
     status = human.get("status")
-    judged = count(dig(results, "judge", CLAIM_RUN, "judged_items"))
-    text = (f"Answers the parser cannot read are graded by a 7B judge model, which can be wrong. In run {CLAIM_RUN} "
-            f"it decided {judged} answers.")
-    overall = dig(human, "by_lang", "all")
-    if status in {"partial", "complete"} and overall:
-        text += (f" On {count(overall.get('n'))} answers labelled blind by a person, the judge agreed "
-                 f"{pct(overall.get('raw_agreement'))} of the time "
-                 f"(Cohen's kappa {fixed(overall.get('cohen_kappa'), 2)}).")
-    elif status == "awaiting_labels":
-        text += f" A blind sample of {count(human.get('sample_size'))} judge decisions is waiting for human labels."
-    else:
-        text += " The blind human check of the judge has not been done yet."
-    return esc(text)
+    path = "second_rater_agreement.claude_vs_human.all"
+    second = dig(results, *path.split(".")) or {}
+    rows, agreement = number(second.get("n")), number(second.get("raw_agreement"))
+    guide = f" {_link(JUDGE_URL, 'JUDGE.md')} describes how the labels were made."
+    if status == "awaiting_labels":
+        sample_size = count(human.get("sample_size"))
+        return esc(f"A blind sample of {sample_size} judge decisions is waiting for review.") + guide
+    if status not in {"partial", "complete"} or rows is None:
+        return esc("The check of the judge against human labels has not been done yet.") + guide
+    kept = NA if agreement is None else count(round(rows * agreement))
+    sample = _result(f"{path}.n", count(rows))
+    text = ("A second AI rater labelled a blind sample of judge decisions without seeing the judge's verdict, the run "
+            f"or the language. A person then reviewed those labels and kept {_derived('agreed', path, kept)} of "
+            f"{sample}. So judge-human agreement is close to judge-AI agreement and is not an independent human "
+            "annotation.")
+    return text + _judge_vs_human(human) + guide
 
 
 def _contamination(results: dict[str, Any]) -> str:
@@ -420,7 +549,9 @@ def _caveats(data: SiteData) -> str:
         ("Template phrasing", _templates(results)),
         ("Language or template wording", _language_templates()),
         ("Hosted endpoint, not official weights", _hosted(results)),
+        ("Serving", _serving_noise(results)),
         ("Judge disagreement", _judge(results)),
+        ("Human check", _human_check(results)),
     )
     body = "".join(f'<li><h3>{esc(title)}</h3><p>{text}</p></li>' for title, text in entries)
     return f"""<section class="caveats wrap grid" id="caveats" aria-labelledby="caveats-h">
@@ -433,8 +564,7 @@ def _caveats(data: SiteData) -> str:
 def landing(data: SiteData) -> str:
     description = TAGLINE
     return (_head("Scrutineer", description) + _nav("finding") + '<main id="main">\n' + _hero(data) + _languages(data)
-            + _method(data)
-            + _caveats(data) + "</main>\n" + _footer(data) + "</body>\n</html>\n")
+            + _serving(data) + _method(data) + _caveats(data) + "</main>\n" + _footer(data) + "</body>\n</html>\n")
 
 
 def _options(name: str, label: str, choices: list[tuple[str, str]]) -> str:

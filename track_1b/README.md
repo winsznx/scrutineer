@@ -10,8 +10,8 @@ On F1 (did the vote pass?) in German, French, Italian and English, Apertus 1.5 7
 The claim we registered before the first request, that Apertus repeats the government's line
 on votes the government lost, failed. The data shows something else. Asked in French or English,
 Apertus calls almost every proposal rejected, while in German it answers close to the true rate.
-The same official 70B weights, served by two deployers at temperature 0, give a different answer
-on about one question in twelve. Public AI's `apertus-v1.5-8b` id answers like the 70B, so no 8B
+Serving matters too: the same official 70B weights on two deployers do not always give the same
+answer at temperature 0 (report, Section 5.4). Public AI's `apertus-v1.5-8b` id answers like the 70B, so no 8B
 result is reported (`docs/DECISIONS.md`, D24).
 
 <!-- scrutineer:begin language_table -->
@@ -32,12 +32,12 @@ result is reported (`docs/DECISIONS.md`, D24).
 | Public AI "8B" route, thinking | French | 2.2% | 46.2% | 54.1% (n=329) | 3.0% |
 | Public AI "8B" route, thinking | Italian | 24.5% | 46.3% | 64.8% (n=324) | 1.9% |
 | Public AI "8B" route, thinking | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
-| 70B thinking (Featherless) | German | 46.2% | 30.8% | 69.2% (n=13) | 0.0% |
-| 70B thinking (Featherless) | English | 33.3% | 44.4% | 66.7% (n=9) | 0.0% |
-| 70B thinking (Featherless) | French | 7.7% | 30.8% | 76.9% (n=13) | 0.0% |
-| 70B thinking (Featherless) | Italian | 46.2% | 30.8% | 84.6% (n=13) | 0.0% |
+| 70B thinking (Featherless) | German | 63.3% | 58.3% | 75.0% (n=60) | 0.0% |
+| 70B thinking (Featherless) | English | 29.1% | 60.0% | 54.5% (n=55) | 0.0% |
+| 70B thinking (Featherless) | French | 6.7% | 58.3% | 48.3% (n=60) | 0.0% |
+| 70B thinking (Featherless) | Italian | 38.3% | 58.3% | 56.7% (n=60) | 0.0% |
 
-Votes where German, French, Italian and English give the same answer: 70B (Featherless): 135 of 309 (43.7%); Public AI "8B" route: 137 of 310 (44.2%); Public AI "8B" route, thinking: 153 of 303 (50.5%); 70B thinking (Featherless): 5 of 9 (55.6%).
+Votes where German, French, Italian and English give the same answer: 70B (Featherless): 135 of 309 (43.7%); Public AI "8B" route: 137 of 310 (44.2%); Public AI "8B" route, thinking: 153 of 303 (50.5%); 70B thinking (Featherless): 19 of 55 (34.5%).
 <!-- scrutineer:end language_table -->
 
 ![Share of F1 answers saying accepted, by language](docs/figures/fig5_language_bias.png)

@@ -248,6 +248,17 @@ def claim_status(results: Results) -> str:
     )
 
 
+def flip_rate(results: Results) -> str:
+    """Share of answers that change between two deployers of the same 70B weights."""
+    pair = results.get("route_identity", {}).get("R1~R1_publicai")
+    if not pair:
+        return "_No deployer comparison available._\n"
+    flipped = 1 - pair["identical_text"]
+    rate = f", about 1 in {round(1 / flipped)}" if flipped else ""
+    return (f"The same official 70B weights at temperature 0, served by Public AI and by Featherless, give a "
+            f"different answer on {pct(flipped)} of the {pair['n']} items both answered{rate}.\n")
+
+
 def r4_table(results: Results) -> str:
     pr = results.get("r4_vs_r1")
     if not pr:
@@ -353,6 +364,7 @@ BLOCKS: dict[str, Callable[[Results], str]] = {
     "r4_table": r4_table,
     "route_identity_text": route_identity_text,
     "claim_status": claim_status,
+    "flip_rate": flip_rate,
 }
 
 

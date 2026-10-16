@@ -84,11 +84,15 @@ review on top, not as an independent second annotation.
 <!-- scrutineer:begin judge_table -->
 | Run | Judged items | By reason | F6 parser vs judge agreement |
 |---|--:|---|--:|
-| R1 | 0 |  | n/a (n=0) |
-| R2 | 5 | unparseable 5 | n/a (n=0) |
-| R3 | 8 | unparseable 8 | n/a (n=0) |
+| R1 | 749 | F6 214, F8 526, unparseable 9 | 99.1% (n=214) |
+| R2 | 0 |  | n/a (n=0) |
+| R3 | 0 |  | n/a (n=0) |
+| R4 | 0 |  | n/a (n=0) |
 <!-- scrutineer:end judge_table -->
 
 <!-- scrutineer:begin human_table -->
-_Human check status: not exported._
+Labelled 311 of 311 sampled judgements (complete). The labeller saw a blind Claude pre-label; human and Claude agree on 99.4% of rows, so judge versus human is close to judge versus Claude and is not an independent second annotation.
+
+| Language | n | Judge 1.1.0 vs human | κ | Judge 1.0.0 vs human | κ |
+|---|--:|--:|--:|--:|--:|
 <!-- scrutineer:end human_table -->
