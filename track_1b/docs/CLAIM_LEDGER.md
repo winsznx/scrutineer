@@ -132,6 +132,17 @@ R4's coverage per phase.
 
 ## Status
 
+Generated from `data/results.json` by `make report`:
+
+<!-- scrutineer:begin claim_status -->
+- C1: **FAILED**. Gap 8.8 points (falsifier: under 10), p = 0.0083, R1 on Featherless (D19).
+- C1b: directional share 96.5%, above the 70% threshold; reported as part of C1, which fails on the gap.
+- C2: within initiatives the gap is 73.2 points; within referendums and counter-proposals it is -27.0 points. The errors follow a default "rejected" answer, not the Federal Council.
+- C3: **SUPPORTED**. F5 95.5% against F1 (de) 30.3% on government-lost votes.
+<!-- scrutineer:end claim_status -->
+
+Registration lines:
+
 - C1: pending (registered 2026-10-15T11:56Z)
 - C1b: pending (registered 2026-10-15T11:56Z)
 - C2: pending (registered 2026-10-15T11:56Z)

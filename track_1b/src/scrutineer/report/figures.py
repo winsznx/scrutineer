@@ -92,12 +92,13 @@ def fig_accuracy_by_gov_lost(results: dict[str, Any], out_dir: Path) -> Path:
             ax.bar(i + offset, acc, width * 0.9, color=colour, label=label if i == 0 else None, zorder=2)
             ax.errorbar(i + offset, acc, yerr=[[acc - lo], [hi - acc]], color=INK, lw=0.8, capsize=2, zorder=3)
             ax.text(i + offset, hi + 2, f"{acc:.0f}%", ha="center", va="bottom", color=INK, fontsize=8)
-    ax.set_xticks(range(len(runs)), [results["runs"][r]["label"] for r in runs])
-    ax.set_ylim(0, 110)
+    ax.set_xticks(range(len(runs)), [results["runs"][r]["label"].replace(", ", ",\n").replace(" (", "\n(")
+                                     for r in runs])
+    ax.set_ylim(0, 125)
     ax.set_yticks([0, 25, 50, 75, 100], ["0", "25", "50", "75", "100%"])
     ax.yaxis.grid(True, color=RULE, lw=0.6, zorder=0)
+    ax.legend(frameon=False, loc="upper left", ncols=2, fontsize=8)
     ax.set_title("F1 outcome accuracy, de/fr/it/en pooled, 95% Wilson CI")
-    ax.legend(frameon=False, loc="upper right", ncols=2, fontsize=8)
     return _save(fig, out_dir, "fig1_accuracy_gov_lost.png")
 
 

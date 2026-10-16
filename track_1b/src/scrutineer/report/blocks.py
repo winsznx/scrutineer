@@ -229,6 +229,25 @@ def route_identity_text(results: Results) -> str:
     return "\n".join(lines) + "\n" if lines else "_No route comparison available._\n"
 
 
+def claim_status(results: Results) -> str:
+    h = results["results"].get("R1", {}).get("headline", {})
+    rvr = results["results"].get("R1", {}).get("reasoning_vs_recall", {}).get("gov_lost", {})
+    within = results["results"].get("R1", {}).get("within_instrument", {})
+    initiative_gap = within.get("initiative", {}).get("gap_points")
+    referendum_gap = within.get("referendum_or_counterproposal", {}).get("gap_points")
+    return (
+        f"- C1: **{results['claims'].get('C1', 'PENDING')}**. Gap {num(h.get('gap_points'))} points "
+        f"(falsifier: under 10), p = {num(h.get('p_value'), 4)}, R1 on Featherless (D19).\n"
+        f"- C1b: directional share {pct(h.get('directional_share'))}, above the 70% threshold; reported as part "
+        "of C1, which fails on the gap.\n"
+        f"- C2: within initiatives the gap is {num(initiative_gap)} points; within "
+        f"referendums and counter-proposals it is {num(referendum_gap)} points. "
+        "The errors follow a default \"rejected\" answer, not the Federal Council.\n"
+        f"- C3: **{results['claims'].get('C3', 'PENDING')}**. F5 {pct(rvr.get('f5_accuracy'))} against "
+        f"F1 (de) {pct(rvr.get('f1_de_accuracy'))} on government-lost votes.\n"
+    )
+
+
 def r4_table(results: Results) -> str:
     pr = results.get("r4_vs_r1")
     if not pr:
@@ -333,6 +352,7 @@ BLOCKS: dict[str, Callable[[Results], str]] = {
     "deployer_text": deployer_text,
     "r4_table": r4_table,
     "route_identity_text": route_identity_text,
+    "claim_status": claim_status,
 }
 
 
