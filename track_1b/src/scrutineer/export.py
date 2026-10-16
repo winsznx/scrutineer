@@ -53,9 +53,20 @@ def export_hf(paths: Paths, out_dir: Path) -> Path:
     with (out_dir / "metadata.jsonl").open("w", encoding="utf-8") as handle:
         for item in items.values():
             handle.write(json.dumps(metadata_row(item), ensure_ascii=False, sort_keys=True) + "\n")
-    for run_id in run_ids(paths):
+    extra_runs = [run for run in ("R1_publicai", "E2") if (paths.responses / f"{run}.jsonl").exists()]
+    for run_id in [*run_ids(paths), *extra_runs]:
         shutil.copy(paths.responses / f"{run_id}.jsonl", out_dir / "responses" / f"{run_id}.jsonl")
         shutil.copy(paths.responses / f"{run_id}.meta.json", out_dir / "responses" / f"{run_id}.meta.json")
+    (out_dir / "robustness").mkdir()
+    shutil.copy(paths.order_swap_items, out_dir / "robustness" / "order_swap_items.jsonl")
+    if (paths.data / "plans").exists():
+        shutil.copytree(paths.data / "plans", out_dir / "plans")
+    (out_dir / "human_check").mkdir()
+    for path in (paths.human_check, paths.human_check_key, paths.prelabels):
+        if path.exists():
+            shutil.copy(path, out_dir / "human_check" / path.name)
+    if paths.judgements.exists():
+        shutil.copytree(paths.judgements, out_dir / "judgements")
     graded = paths.data / "graded"
     if graded.exists():
         shutil.copytree(graded, out_dir / "graded")

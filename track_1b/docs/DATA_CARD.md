@@ -29,12 +29,18 @@ configs:
     path: metadata.jsonl
 - config_name: responses
   data_files:
-  - split: R1_apertus_v1.5_70b
+  - split: R1_70b_featherless
     path: responses/R1.jsonl
-  - split: R2_apertus_v1.5_8b
+  - split: R2_publicai_8b_route
     path: responses/R2.jsonl
-  - split: R3_apertus_v1.5_8b_thinking
+  - split: R3_publicai_8b_route_thinking
     path: responses/R3.jsonl
+  - split: R4_70b_thinking_featherless_sample
+    path: responses/R4.jsonl
+  - split: R1_publicai_70b_first_287
+    path: responses/R1_publicai.jsonl
+  - split: E2_option_order_swap
+    path: responses/E2.jsonl
 ---
 
 # Dataset Card for Scrutineer
@@ -61,8 +67,14 @@ The dataset has three parts:
 
 - `items`: the evaluation set. One question per row, with a gold answer, accepted answer
   variations, source citations and stratum labels.
-- `responses`: the verbatim answers of Apertus 1.5 models to every item, one split per run,
-  with request hashes, token usage, cost and latency.
+- `responses`: the verbatim answers of Apertus 1.5 to every item, one split per run, with
+  request hashes, token usage, cost and latency. The runs are:
+  - `R1`: the official `swiss-ai/Apertus-v1.5-70B` on Featherless through the Hugging Face router, all 6,716 items.
+  - `R2`: Public AI's `swiss-ai/apertus-v1.5-8b` id, all items. Its answers match R1 word for word on 92% of items, so it is not presented as the 8B (DECISIONS D24).
+  - `R3`: the same Public AI route with thinking switched on.
+  - `R4`: the 70B with thinking on Featherless, a pre-registered stratified sample (CLAIM_LEDGER, R4).
+  - `R1_publicai`: the first 287 R1 items as answered by Public AI's 70B route before it went down, kept for deployer agreement.
+  - `E2`: an option-order robustness check on the de/fr/en F1 items (`robustness/order_swap_items.jsonl`).
 - `metadata`: one row per item with instance-level provenance and licensing.
 
 Eight question families probe the same vote from different sides:
@@ -259,7 +271,10 @@ Model, run and judge verdict are hidden in a separate key file. The labeller ass
 records a timestamp per row. The full protocol, with worked examples, is `docs/ANNOTATION_GUIDE.md`.
 
 <!-- scrutineer:begin human_table -->
-_Human check status: not exported._
+Labelled 311 of 311 sampled judgements (complete). The labeller saw a blind Claude pre-label; human and Claude agree on 99.4% of rows, so judge versus human is close to judge versus Claude and is not an independent second annotation.
+
+| Language | n | Judge 1.1.0 vs human | κ | Judge 1.0.0 vs human | κ |
+|---|--:|--:|--:|--:|--:|
 <!-- scrutineer:end human_table -->
 
 #### Annotator Details
