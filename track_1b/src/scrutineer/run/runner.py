@@ -161,13 +161,14 @@ def order_items(items: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
 def pending_items(
     items: list[dict[str, Any]], existing: dict[str, dict[str, Any]], retry_failed: bool
 ) -> list[dict[str, Any]]:
+    """Items still to send, in the order given. Callers decide the order (family priority or a plan)."""
     def needs_request(item_id: str) -> bool:
         record = existing.get(item_id)
         if record is None:
             return True
         return record["status"] == "failed" and retry_failed
 
-    return [item for item in order_items(items) if needs_request(item["item_id"])]
+    return [item for item in items if needs_request(item["item_id"])]
 
 
 def _now() -> str:

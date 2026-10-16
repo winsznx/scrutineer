@@ -1,0 +1,31 @@
+{
+  "run_id": "R1_publicai",
+  "model": "swiss-ai/apertus-v1.5-70b",
+  "wire_model": "swiss-ai/apertus-v1.5-70b",
+  "provider": "publicai",
+  "endpoint": "https://api.publicai.co/v1/chat/completions",
+  "thinking": false,
+  "temperature": 0.0,
+  "seed": 0,
+  "max_tokens": {
+    "F1": 60,
+    "F7": 60,
+    "F5": 60,
+    "F3": 60,
+    "F4": 60,
+    "F2": 60,
+    "F6": 60,
+    "F8": 120
+  },
+  "system_prompt": null,
+  "price_usd_per_mtok": [
+    0.82,
+    2.92
+  ],
+  "workers": 8,
+  "rpm": 100,
+  "items_sha256": "fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee",
+  "started_at": "2026-10-15T11:56:50.668+00:00",
+  "comparison_of": "R1",
+  "note": "R1's first route (Public AI), stopped 2026-10-15 after the 70B upstream returned HTTP 429 for hours; kept for deployer agreement"
+}

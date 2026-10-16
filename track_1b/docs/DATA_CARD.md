@@ -72,7 +72,7 @@ The dataset has three parts:
   - `R1`: the official `swiss-ai/Apertus-v1.5-70B` on Featherless through the Hugging Face router, all 6,716 items.
   - `R2`: Public AI's `swiss-ai/apertus-v1.5-8b` id, all items. Its answers match R1 word for word on 92% of items, so it is not presented as the 8B (DECISIONS D24).
   - `R3`: the same Public AI route with thinking switched on.
-  - `R4`: the 70B with thinking on Featherless, a pre-registered stratified sample (CLAIM_LEDGER, R4).
+  - `R4`: the 70B with thinking on Featherless, stopped by a time limit. It answered all F1, F5 and F7 items and 636 early F3 items. It was registered as a stratified sample, but a runner bug made it follow the default family order (DECISIONS D26).
   - `R1_publicai`: the first 287 R1 items as answered by Public AI's 70B route before it went down, kept for deployer agreement.
   - `E2`: an option-order robustness check on the de/fr/en F1 items (`robustness/order_swap_items.jsonl`).
 - `metadata`: one row per item with instance-level provenance and licensing.
@@ -275,6 +275,11 @@ Labelled 311 of 311 sampled judgements (complete). The labeller saw a blind Clau
 
 | Language | n | Judge 1.1.0 vs human | κ | Judge 1.0.0 vs human | κ |
 |---|--:|--:|--:|--:|--:|
+| all | 311 | 94.5% | 0.887 | 88.4% | 0.770 |
+| German | 83 | 95.2% | 0.901 | 83.1% | 0.667 |
+| English | 78 | 89.7% | 0.790 | 78.2% | 0.589 |
+| French | 84 | 95.2% | 0.902 | 97.6% | 0.952 |
+| Italian | 66 | 98.5% | 0.967 | 95.5% | 0.903 |
 <!-- scrutineer:end human_table -->
 
 #### Annotator Details

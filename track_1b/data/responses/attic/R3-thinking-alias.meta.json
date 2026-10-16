@@ -1,0 +1,29 @@
+{
+  "run_id": "R3",
+  "model": "swiss-ai/apertus-v1.5-8b-thinking",
+  "wire_model": "swiss-ai/apertus-v1.5-8b-thinking",
+  "provider": "publicai",
+  "endpoint": "https://api.publicai.co/v1/chat/completions",
+  "thinking": true,
+  "temperature": 0.0,
+  "seed": 0,
+  "max_tokens": {
+    "F1": 2000,
+    "F7": 2000,
+    "F5": 2000,
+    "F3": 2000,
+    "F4": 2000,
+    "F2": 2000,
+    "F6": 2000,
+    "F8": 2000
+  },
+  "system_prompt": null,
+  "price_usd_per_mtok": [
+    0.1,
+    0.2
+  ],
+  "workers": 6,
+  "rpm": 25,
+  "items_sha256": "fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee",
+  "started_at": "2026-10-15T12:41:47.752+00:00"
+}

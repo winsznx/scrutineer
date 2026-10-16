@@ -1,0 +1,30 @@
+{
+  "run_id": "R1",
+  "model": "swiss-ai/Apertus-v1.5-70B",
+  "wire_model": "swiss-ai/Apertus-v1.5-70B:featherless-ai",
+  "provider": "hf",
+  "endpoint": "https://router.huggingface.co/v1/chat/completions",
+  "thinking": false,
+  "thinking_switch": null,
+  "temperature": 0.0,
+  "seed": 0,
+  "max_tokens": {
+    "F1": 60,
+    "F7": 60,
+    "F5": 60,
+    "F3": 60,
+    "F4": 60,
+    "F2": 60,
+    "F6": 60,
+    "F8": 120
+  },
+  "system_prompt": null,
+  "price_usd_per_mtok": [
+    0.875,
+    2.08
+  ],
+  "workers": 8,
+  "rpm": 60,
+  "items_sha256": "fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee",
+  "started_at": "2026-10-15T15:50:55.849+00:00"
+}

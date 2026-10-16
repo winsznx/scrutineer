@@ -147,3 +147,4 @@ Registration lines:
 - C1b: pending (registered 2026-10-15T11:56Z)
 - C2: pending (registered 2026-10-15T11:56Z)
 - C3: pending (registered 2026-10-15T11:56Z)
+- R4 (2026-10-16T04:50Z): the registered order was not followed because of a runner bug (DECISIONS D26). R4 answered all F1, F5 and F7 items and 636 early F3 items. The registered lost/won comparison is reported on the complete F1 set, which contains every registered pair.

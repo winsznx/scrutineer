@@ -84,7 +84,7 @@ def test_resume_never_resends_completed_items(tmp_path: Path) -> None:
     items = make_items(4)
     run(tmp_path, FakeServer(), items[:2])
     existing = read_records(tmp_path / "T.jsonl")
-    todo = pending_items(items, existing, retry_failed=False)
+    todo = pending_items(order_items(items), existing, retry_failed=False)
     assert [i["item_id"] for i in todo] == [items[2]["item_id"], items[3]["item_id"]]
     server = FakeServer()
     run(tmp_path, server, todo)
@@ -222,3 +222,12 @@ def test_stop_at_in_the_past_sends_nothing(tmp_path: Path) -> None:
     asyncio.run(runner.run(make_items(5)))
     assert server.calls == []
     assert runner.state.stop_kind == "deadline"
+
+
+def test_pending_items_keeps_the_given_order() -> None:
+    items = [
+        {"item_id": "9-F8-de", "anr": "9", "family": "F8", "lang": "de"},
+        {"item_id": "1-F1-de", "anr": "1", "family": "F1", "lang": "de"},
+        {"item_id": "5-F3-fr", "anr": "5", "family": "F3", "lang": "fr"},
+    ]
+    assert [i["item_id"] for i in pending_items(items, {}, retry_failed=False)] == ["9-F8-de", "1-F1-de", "5-F3-fr"]

@@ -96,6 +96,11 @@ Labelled 311 of 311 sampled judgements (complete). The labeller saw a blind Clau
 
 | Language | n | Judge 1.1.0 vs human | κ | Judge 1.0.0 vs human | κ |
 |---|--:|--:|--:|--:|--:|
+| all | 311 | 94.5% | 0.887 | 88.4% | 0.770 |
+| German | 83 | 95.2% | 0.901 | 83.1% | 0.667 |
+| English | 78 | 89.7% | 0.790 | 78.2% | 0.589 |
+| French | 84 | 95.2% | 0.902 | 97.6% | 0.952 |
+| Italian | 66 | 98.5% | 0.967 | 95.5% | 0.903 |
 <!-- scrutineer:end human_table -->
 
 **Contamination.** None of swissvotes.ch, bk.admin.ch or admin.ch is on Apertus's robots.txt
@@ -118,7 +123,10 @@ Sample: 100,000 FineWeb-2 documents per language (revision `af9c1333`, seed 0). 
 
 Temperature 0, seed 0, no system prompt, `max_tokens` 60 (F8: 120; thinking: 2,000).
 Thinking is switched on with `chat_template_kwargs: {"enable_thinking": true}` (D17).
-R4 is a pre-registered stratified sample in matched lost/won pairs (CLAIM_LEDGER, R4).
+R4 was registered as a stratified sample in matched lost/won pairs (CLAIM_LEDGER, R4). A
+runner bug made it follow the default family order instead (D26). By its time limit it had
+answered every F1, F5 and F7 item, so the comparison it was registered for runs on the full
+F1 set.
 
 <!-- scrutineer:begin runs_table -->
 | Run | Model id | Answered | Failed (final) | Failed attempts logged | Cost (USD) | Tokens in / out | Latency p50 / p95 (ms) |
@@ -126,7 +134,7 @@ R4 is a pre-registered stratified sample in matched lost/won pairs (CLAIM_LEDGER
 | R1 | `swiss-ai/Apertus-v1.5-70B` | 6,716 / 6,716 | 0 | 0 | 1.0291 | 973,764 / 85,120 | 1626 / 3373 |
 | R2 | `swiss-ai/apertus-v1.5-8b` | 6,716 / 6,716 | 0 | 85 | 0.1144 | 973,764 / 85,312 | 880 / 3812 |
 | R3 | `swiss-ai/apertus-v1.5-8b` | 6,716 / 6,716 | 0 | 2 | 0.4291 | 973,764 / 1,658,495 | 1341 / 37854 |
-| R4 | `swiss-ai/Apertus-v1.5-70B` | 239 / 6,716 | 0 | 0 | 0.1076 | 32,957 / 37,876 | 1276 / 28090 |
+| R4 | `swiss-ai/Apertus-v1.5-70B` | 2,351 / 6,716 | 0 | 0 | 1.1372 | 350,212 / 399,425 | 1309 / 24859 |
 <!-- scrutineer:end runs_table -->
 
 ## 5. Results
@@ -153,10 +161,10 @@ The pooled gap is small, but it hides two large effects in opposite directions:
 | 70B (Featherless) | referendum or counterproposal | 40.0% (n=545) | 67.0% (n=203) | -27.0 | 0.0000 |
 | Public AI "8B" route | initiative | 90.3% (n=524) | 17.2% (n=58) | 73.0 | 0.0000 |
 | Public AI "8B" route | referendum or counterproposal | 40.2% (n=545) | 67.0% (n=203) | -26.8 | 0.0000 |
-| Public AI "8B" route, thinking | initiative | 91.8% (n=515) | 17.2% (n=58) | 74.6 | 0.0000 |
-| Public AI "8B" route, thinking | referendum or counterproposal | 39.1% (n=534) | 70.4% (n=199) | -31.2 | 0.0000 |
-| 70B thinking (Featherless) | initiative | 88.9% (n=63) | 12.5% (n=8) | 76.4 | 0.0000 |
-| 70B thinking (Featherless) | referendum or counterproposal | 47.6% (n=126) | 55.3% (n=38) | -7.6 | 0.4087 |
+| Public AI "8B" route, thinking | initiative | 90.6% (n=524) | 17.2% (n=58) | 73.4 | 0.0000 |
+| Public AI "8B" route, thinking | referendum or counterproposal | 38.3% (n=545) | 69.5% (n=203) | -31.1 | 0.0000 |
+| 70B thinking (Featherless) | initiative | 89.9% (n=524) | 19.0% (n=58) | 70.9 | 0.0000 |
+| 70B thinking (Featherless) | referendum or counterproposal | 38.9% (n=545) | 68.0% (n=203) | -29.1 | 0.0000 |
 | Baseline: always the FC's line | all | 100.0% | 0.0% | | |
 | Baseline: initiatives fail, all else passes | all | 99.3% | 0.0% | | |
 <!-- scrutineer:end within_instrument -->
@@ -184,16 +192,17 @@ yes/no question it is true by construction (C1b, D7).
 | Public AI "8B" route | Italian | 33.5% | 46.1% | 67.1% (n=334) | 5.4% |
 | Public AI "8B" route | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
 | Public AI "8B" route, thinking | German | 47.2% | 46.1% | 75.7% (n=334) | 4.2% |
-| Public AI "8B" route, thinking | English | 15.8% | 45.1% | 59.9% (n=319) | 5.0% |
-| Public AI "8B" route, thinking | French | 2.2% | 46.2% | 54.1% (n=329) | 3.0% |
-| Public AI "8B" route, thinking | Italian | 24.5% | 46.3% | 64.8% (n=324) | 1.9% |
+| Public AI "8B" route, thinking | English | 15.8% | 45.4% | 58.2% (n=328) | 4.9% |
+| Public AI "8B" route, thinking | French | 2.2% | 46.1% | 54.2% (n=334) | 3.0% |
+| Public AI "8B" route, thinking | Italian | 24.5% | 46.1% | 62.9% (n=334) | 1.8% |
 | Public AI "8B" route, thinking | Romansh | 5.6% | 41.9% | 35.5% (n=31) | 41.9% |
-| 70B thinking (Featherless) | German | 63.3% | 58.3% | 75.0% (n=60) | 0.0% |
-| 70B thinking (Featherless) | English | 29.1% | 60.0% | 54.5% (n=55) | 0.0% |
-| 70B thinking (Featherless) | French | 6.7% | 58.3% | 48.3% (n=60) | 0.0% |
-| 70B thinking (Featherless) | Italian | 38.3% | 58.3% | 56.7% (n=60) | 0.0% |
+| 70B thinking (Featherless) | German | 46.9% | 46.1% | 74.9% (n=334) | 4.2% |
+| 70B thinking (Featherless) | English | 17.4% | 45.4% | 58.5% (n=328) | 4.6% |
+| 70B thinking (Featherless) | French | 2.5% | 46.1% | 53.9% (n=334) | 4.2% |
+| 70B thinking (Featherless) | Italian | 25.2% | 46.1% | 62.9% (n=334) | 2.7% |
+| 70B thinking (Featherless) | Romansh | 0.0% | 41.9% | 32.3% (n=31) | 38.7% |
 
-Votes where German, French, Italian and English give the same answer: 70B (Featherless): 135 of 309 (43.7%); Public AI "8B" route: 137 of 310 (44.2%); Public AI "8B" route, thinking: 153 of 303 (50.5%); 70B thinking (Featherless): 19 of 55 (34.5%).
+Votes where German, French, Italian and English give the same answer: 70B (Featherless): 135 of 309 (43.7%); Public AI "8B" route: 137 of 310 (44.2%); Public AI "8B" route, thinking: 153 of 303 (50.5%); 70B thinking (Featherless): 146 of 296 (49.3%).
 <!-- scrutineer:end language_table -->
 
 ![Share of F1 answers saying accepted, by language](docs/figures/fig5_language_bias.png)
@@ -229,14 +238,14 @@ correctly on votes that have not happened (F7):
 <!-- scrutineer:begin family_table -->
 | Family | 70B (Featherless) | Public AI "8B" route | Public AI "8B" route, thinking | 70B thinking (Featherless) |
 |---|--:|--:|--:|--:|
-| F1 Outcome | 63.0% (n=1330) | 63.0% (n=1330) | 63.7% (n=1306) | 58.7% (n=235) |
-| F2 Yes share | 11.6% (n=1330) | 11.1% (n=1326) | 14.8% (n=1089) | not run |
-| F3 FC recommendation | 79.3% (n=1330) | 79.5% (n=1322) | 85.4% (n=1301) | not run |
-| F4 Cantons majority | 73.0% (n=797) | 72.8% (n=797) | 71.8% (n=785) | not run |
-| F5 Reasoning control | 98.5% (n=334) | 98.5% (n=334) | 98.2% (n=334) | not run |
-| F6 In the constitution | 56.1% (n=214) | not run | not run | not run |
-| F7 Post-cutoff | 100.0% (n=16) | 100.0% (n=16) | 100.0% (n=16) | not run |
-| F8 Free recall | 58.0% (n=526) | not run | not run | not run |
+| F1 Outcome | 63.0% (n=1330) | 63.0% (n=1330) | 62.8% (n=1330) | 62.6% (n=1330) |
+| F2 Yes share | 11.6% (n=1330) | 11.1% (n=1330) | 12.1% (n=1330) | not run |
+| F3 FC recommendation | 79.3% (n=1330) | 79.4% (n=1330) | 83.6% (n=1330) | 83.3% (n=636) |
+| F4 Cantons majority | 73.0% (n=797) | 72.8% (n=797) | 71.5% (n=797) | not run |
+| F5 Reasoning control | 98.5% (n=334) | 98.5% (n=334) | 98.2% (n=334) | 98.2% (n=334) |
+| F6 In the constitution | 56.1% (n=214) | 55.6% (n=214) | 55.1% (n=214) | not run |
+| F7 Post-cutoff | 100.0% (n=16) | 100.0% (n=16) | 100.0% (n=16) | 100.0% (n=16) |
+| F8 Free recall | 61.2% (n=1330) | 61.7% (n=1330) | 55.8% (n=1330) | not run |
 <!-- scrutineer:end family_table -->
 
 <!-- scrutineer:begin secondary_table -->
@@ -245,7 +254,7 @@ correctly on votes that have not happened (F7):
 | 70B (Featherless) | 14.5 | 13.0% | 100.0% (n=16) | 65.2 pts |
 | Public AI "8B" route | 14.7 | 12.5% | 100.0% (n=16) | 65.2 pts |
 | Public AI "8B" route, thinking | 12.3 | 15.4% | 100.0% (n=16) | 56.1 pts |
-| 70B thinking (Featherless) | n/a | n/a | n/a (n=0) | n/a pts |
+| 70B thinking (Featherless) | n/a | n/a | 100.0% (n=16) | 56.1 pts |
 <!-- scrutineer:end secondary_table -->
 
 ### 5.4 Serving: one model, three routes
@@ -254,7 +263,7 @@ correctly on votes that have not happened (F7):
 - the official 70B (Featherless) and Public AI's "8B" route: identical text on 91.9% of 6,716 items
 - the official 70B on Featherless and on Public AI: identical text on 92.3% of 287 items
 - Public AI's 70B and "8B" routes: identical text on 92.3% of 287 items
-- Public AI's "8B" route with thinking and the 70B with thinking (Featherless): identical text on 75.3% of 239 items
+- Public AI's "8B" route with thinking and the 70B with thinking (Featherless): identical text on 68.8% of 2,351 items
 <!-- scrutineer:end route_identity_text -->
 
 <!-- scrutineer:begin flip_rate -->
@@ -276,21 +285,22 @@ weights are gated and were not available during the build.
 | Public AI "8B" route, thinking | French | 12.4% | 79 | 6 |
 | Public AI "8B" route, thinking | Italian | 10.0% | 56 | 3 |
 | Public AI "8B" route, thinking | Romansh | 0.0% | 4 | 0 |
-| 70B thinking (Featherless) | German | 0.0% | 3 | 0 |
-| 70B thinking (Featherless) | English | 100.0% | 631 | 4 |
-| 70B thinking (Featherless) | French | 0.0% | 4 | 0 |
-| 70B thinking (Featherless) | Italian | 0.0% | 3 | 0 |
+| 70B thinking (Featherless) | German | 16.1% | 100 | 10 |
+| 70B thinking (Featherless) | English | 99.6% | 536 | 25 |
+| 70B thinking (Featherless) | French | 10.2% | 69 | 5 |
+| 70B thinking (Featherless) | Italian | 9.2% | 40 | 1 |
+| 70B thinking (Featherless) | Romansh | 0.0% | 4 | 0 |
 <!-- scrutineer:end thinking_table -->
 
 With thinking switched on, the model writes a reasoning trace for almost every English
-question and rarely for the others, and English traces often hit the 2,000-token limit.
+question and rarely for the others. Some English traces hit the 2,000-token limit before giving an answer.
 Thinking barely changes F1 accuracy:
 
 <!-- scrutineer:begin r4_table -->
-| Items (F1 and F3, answered by both) | n | 70B | 70B thinking | Only 70B right | Only thinking right |
+| F1 items (answered by both) | n | 70B | 70B thinking | Only 70B right | Only thinking right |
 |---|--:|--:|--:|--:|--:|
-| Government won | 189 | 60.3% | 61.4% | 11 | 13 |
-| Government lost | 46 | 50.0% | 47.8% | 4 | 3 |
+| Government won | 1095 | 63.8% | 62.9% | 50 | 40 |
+| Government lost | 266 | 56.4% | 57.5% | 16 | 19 |
 <!-- scrutineer:end r4_table -->
 
 ### 5.6 Judge versions
@@ -298,9 +308,9 @@ Thinking barely changes F1 accuracy:
 <!-- scrutineer:begin judge_versions_table -->
 | Run | F6 judge 1.0.0 | F6 judge 1.1.0 | F8 judge 1.0.0 | F8 judge 1.1.0 |
 |---|--:|--:|--:|--:|
-| 70B (Featherless) | 56.1% | 56.1% | 54.8% | 57.8% |
-| Public AI "8B" route | 55.6% | n/a | 53.4% | n/a |
-| Public AI "8B" route, thinking | 55.1% | n/a | 49.6% | n/a |
+| 70B (Featherless) | 56.1% | 56.1% | 54.8% | 61.2% |
+| Public AI "8B" route | 55.6% | 55.6% | 53.4% | 61.7% |
+| Public AI "8B" route, thinking | 55.1% | 55.1% | 49.6% | 55.8% |
 | 70B thinking (Featherless) | n/a | n/a | n/a | n/a |
 <!-- scrutineer:end judge_versions_table -->
 

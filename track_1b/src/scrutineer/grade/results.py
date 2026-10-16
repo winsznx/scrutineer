@@ -272,12 +272,12 @@ def thinking_traces(paths: Paths, run: str) -> dict[str, Any]:
 
 
 def paired_runs(graded: dict[str, list[dict[str, Any]]], left: str, right: str) -> dict[str, Any] | None:
-    """Accuracy of two runs on exactly the F1/F3 items both answered, split by gov_lost."""
+    """Accuracy of two runs on exactly the F1 items both answered, split by gov_lost."""
     if left not in graded or right not in graded:
         return None
     a = {g["item_id"]: g for g in graded[left] if g.get("grade")}
     b = {g["item_id"]: g for g in graded[right] if g.get("grade")}
-    shared = [k for k in a if k in b and a[k]["family"] in {"F1", "F3"} and a[k]["strata"]["gov_lost"] is not None]
+    shared = [k for k in a if k in b and a[k]["family"] == "F1" and a[k]["strata"]["gov_lost"] is not None]
     out: dict[str, Any] = {"left": left, "right": right}
     for label, value in (("gov_won", 0), ("gov_lost", 1)):
         keys = [k for k in shared if a[k]["strata"]["gov_lost"] == value]

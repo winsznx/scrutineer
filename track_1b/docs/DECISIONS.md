@@ -299,3 +299,23 @@ deadline, R4's time limit was brought forward to 04:45 UTC on 16 October. The de
 made at 03:10 UTC, before R4 reached the end of its F8 phase, and without looking at R4's
 results. The pre-registered order is unchanged: the run stops wherever it is in that order,
 and the report states coverage per phase.
+
+## D26. R4 did not follow its pre-registered order (runner bug)
+
+R4 was launched with `--plan data/plans/R4_order.jsonl`. The runner sorted the selection by
+the plan, but its resume step, `pending_items`, then re-sorted it into the default family
+priority (F1, F7, F5, F3, ...). R4 therefore answered items in family order, not in the
+registered order. By its 04:45 UTC time limit it had answered every F1 item (1,361), every F5
+and F7 item, and 636 F3 items (the earliest votes in vote-number order), and no F8, F6, F4
+or F2 items.
+
+What this changes:
+
+- The registered matched-pair comparison is still possible and is stronger than planned,
+  because R4 answered the complete F1 set, which contains every pair. The report compares
+  R4 with R1 on all F1 items both answered.
+- R4's F3 answers cover only early votes and are left out of the comparisons. R4 has no
+  F8, F6, F4 or F2 results.
+- The bug was found after R4 stopped, while checking the results against the registered
+  plan, and before any R4 result was written up. `pending_items` now keeps the order it is
+  given, and a test covers it.

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Scrutineer explorer</title>
+<meta name="description" content="Every vote in the Scrutineer benchmark with each model&#x27;s verbatim answers and verdicts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;family=Inter+Tight:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap top-row"><a class="wordmark" href="index.html">Scrutineer</a><nav aria-label="Main"><ul><li><a href="index.html#finding">Finding</a></li><li><a href="explorer.html" aria-current="page">Explorer</a></li><li><a href="https://github.com/winsznx/scrutineer/blob/main/track_1b/Scrutineer_Report.pdf">Report</a></li></ul></nav></div></header>
+<main id="main" class="explorer">
+<section class="wrap grid explorer-intro">
+<h1 class="page-title">Explorer</h1>
+<p class="lede">Every vote in the benchmark. Choose a language to read titles and verdicts in it, and open a vote
+to see the gold answers, the sources and every answer each model gave.</p>
+</section>
+<div class="wrap">
+<form class="filters" role="search" aria-label="Filter votes"><div class="field"><label for="f-lang">Language</label><select id="f-lang" name="lang"><option value="de">German</option><option value="fr">French</option><option value="it">Italian</option><option value="en">English</option><option value="rm">Romansh</option></select></div><div class="field"><label for="f-gov">Government</label><select id="f-gov" name="gov"><option value="all">Won or lost</option><option value="won">Won</option><option value="lost">Lost</option></select></div><div class="field"><label for="f-inst">Instrument</label><select id="f-inst" name="inst"><option value="all">All instruments</option><option value="initiative">Popular initiative</option><option value="counterproposal">Counter-proposal</option><option value="referendum_obligatory">Mandatory referendum</option><option value="referendum_optional">Optional referendum</option></select></div><div class="field"><label for="f-era">Era</label><select id="f-era" name="era"><option value="all">All years</option><option value="1990s">1990s</option><option value="2000s">2000s</option><option value="2010s">2010s</option><option value="2020s">2020s</option></select></div><div class="field field-search"><label for="f-q">Search titles</label><input id="f-q" name="q" type="search" autocomplete="off" spellcheck="false"></div></form>
+<p class="count" id="count" aria-live="polite">Loading votes</p>
+<table class="votes" id="votes">
+<caption class="visually-hidden">Votes, with each run's verdict on the outcome question in the selected
+language</caption>
+<thead><tr><th scope="col" class="date-col">Date</th><th scope="col">Vote</th><th scope="col">Instrument</th>
+<th scope="col">Government</th><th scope="col">Outcome</th><th scope="col" class="verdict-col">70B (Featherless)</th><th scope="col" class="verdict-col">Public AI &quot;8B&quot; route</th><th scope="col" class="verdict-col">Public AI &quot;8B&quot; route, thinking</th><th scope="col" class="verdict-col">70B thinking (Featherless)</th></tr></thead>
+<tbody id="votes-body"></tbody>
+</table>
+<p class="table-note">Run columns show the verdict on the outcome question (F1) in the selected language. For the
+votes not yet held it is F7, where the right answer is that the vote has not happened.</p>
+<noscript><p>The explorer needs JavaScript. The raw data is in <a href="data/votes.json">data/votes.json</a>.
+</p></noscript>
+</div>
+</main>
+<footer class="foot"><div class="wrap grid">
+<div class="foot-col">
+<p>Code: Apache-2.0. Dataset: CDLA-Permissive-2.0. Report: CC-BY-4.0.</p>
+<p>Vote data: <a href="https://swissvotes.ch">Swissvotes</a>, CC BY 4.0, Année Politique Suisse, Universität Bern.
+Official titles: Federal Chancellery, via LINDAS.</p>
+</div>
+<div class="foot-col">
+<p>Items sha256 <code>fe3ee9af2f440fa314554c0201e5fff83145bbe3e49bcb5e4e7400b86e1625ee</code></p>
+<p>Every result on the finding page is generated from results.json, sha256
+<code>9f34f0fc8819b424459c3f784fe2033e7e3cf7de86339b44000aa17fc9dea246</code>, schema 1.0.0. The explorer reads the graded and raw answer files.</p>
+</div>
+</div></footer>
+<script src="explorer.js" defer></script>
+</body>
+</html>

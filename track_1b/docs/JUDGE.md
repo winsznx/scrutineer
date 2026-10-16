@@ -84,10 +84,10 @@ review on top, not as an independent second annotation.
 <!-- scrutineer:begin judge_table -->
 | Run | Judged items | By reason | F6 parser vs judge agreement |
 |---|--:|---|--:|
-| R1 | 749 | F6 214, F8 526, unparseable 9 | 99.1% (n=214) |
-| R2 | 0 |  | n/a (n=0) |
-| R3 | 0 |  | n/a (n=0) |
-| R4 | 0 |  | n/a (n=0) |
+| R1 | 1553 | F6 214, F8 1330, unparseable 9 | 99.1% (n=214) |
+| R2 | 1556 | F6 214, F8 1330, unparseable 12 | 99.5% (n=214) |
+| R3 | 1850 | F6 214, F8 1330, unparseable 306 | 99.1% (n=214) |
+| R4 | 52 | unparseable 52 | n/a (n=0) |
 <!-- scrutineer:end judge_table -->
 
 <!-- scrutineer:begin human_table -->
@@ -95,4 +95,9 @@ Labelled 311 of 311 sampled judgements (complete). The labeller saw a blind Clau
 
 | Language | n | Judge 1.1.0 vs human | κ | Judge 1.0.0 vs human | κ |
 |---|--:|--:|--:|--:|--:|
+| all | 311 | 94.5% | 0.887 | 88.4% | 0.770 |
+| German | 83 | 95.2% | 0.901 | 83.1% | 0.667 |
+| English | 78 | 89.7% | 0.790 | 78.2% | 0.589 |
+| French | 84 | 95.2% | 0.902 | 97.6% | 0.952 |
+| Italian | 66 | 98.5% | 0.967 | 95.5% | 0.903 |
 <!-- scrutineer:end human_table -->

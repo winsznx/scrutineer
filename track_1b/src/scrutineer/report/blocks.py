@@ -263,7 +263,7 @@ def r4_table(results: Results) -> str:
     pr = results.get("r4_vs_r1")
     if not pr:
         return "_R4 not run._\n"
-    rows = ["| Items (F1 and F3, answered by both) | n | 70B | 70B thinking | Only 70B right | Only thinking right |",
+    rows = ["| F1 items (answered by both) | n | 70B | 70B thinking | Only 70B right | Only thinking right |",
             "|---|--:|--:|--:|--:|--:|"]
     for label in ("gov_won", "gov_lost"):
         c = pr[label]
